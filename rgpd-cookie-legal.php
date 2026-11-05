@@ -26,7 +26,7 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *  - Eliminadas dependencias de servicios externos.
  */
 // Añadimos seguridad y definimos constantes.
-if ( ! defined( 'ABSPATH' ) ) { 
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -35,23 +35,21 @@ if ( ! defined( 'CDLOPD_PLUGIN_URL' ) ) {
 }
 
 if ( is_admin() ) {
-	require_once dirname( __FILE__ ) . '/admin/class-cdlopd-admin.php';
+	require_once __DIR__ . '/admin/class-cdlopd-admin.php';
 	$CDLOPD_Admin = new CDLOPD_Admin();
-	$CDLOPD_Admin -> init();
+	$CDLOPD_Admin->init();
 
-	
-	
+
+
 } else {
-	require_once dirname( __FILE__ ) . '/public/class-cdlopd-public.php';
+	require_once __DIR__ . '/public/class-cdlopd-public.php';
 	$CDLOPD_Public = new CDLOPD_Public();
-	$CDLOPD_Public -> init();
+	$CDLOPD_Public->init();
 }
-require_once dirname( __FILE__ ) . '/public/customizer.php';
+require_once __DIR__ . '/public/customizer.php';
 
 
 function cdlopd_load_plugin_textdomain() {
-    load_plugin_textdomain( 'click-datos-lopd', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+	load_plugin_textdomain( 'click-datos-lopd', false, basename( __DIR__ ) . '/languages/' );
 }
 add_action( 'plugins_loaded', 'cdlopd_load_plugin_textdomain' );
-
-
