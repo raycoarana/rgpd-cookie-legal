@@ -1,16 +1,29 @@
 <?xml version="1.0"?>
 <ruleset name="RGPD Cookie Legal">
-	<description>WordPress coding standards for RGPD Cookie Legal.</description>
+	<description>
+		Security-focused checks for RGPD Cookie Legal, a maintenance fork of a
+		legacy plugin. The gate is the WordPress.org review criteria (escaping,
+		sanitizing, nonces, DB safety), not full WordPress-Core style: the
+		inherited code predates those style rules and rewriting it would be a
+		large, behaviour-risking change with no security benefit.
+	</description>
 
-	<rule ref="WordPress-Core" />
-	<rule ref="WordPress-Docs" />
+	<rule ref="WordPress.Security.EscapeOutput"/>
+	<rule ref="WordPress.Security.NonceVerification"/>
+	<rule ref="WordPress.Security.ValidatedSanitizedInput"/>
+	<rule ref="WordPress.Security.SafeRedirect"/>
+	<rule ref="WordPress.DB.PreparedSQL"/>
+	<rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
+	<rule ref="WordPress.WP.GlobalVariablesOverride"/>
 
-	<config name="text_domain" value="click-datos-lopd" />
-	<config name="minimum_wp_version" value="4.7" />
+	<config name="text_domain" value="click-datos-lopd"/>
+	<config name="minimum_wp_version" value="4.7"/>
 
 	<file>.</file>
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/dist/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
 	<exclude-pattern>*.min.js</exclude-pattern>
 </ruleset>
