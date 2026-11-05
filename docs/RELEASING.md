@@ -20,7 +20,7 @@ Steps:
 2. Add that version and its changes at the top of the `== Changelog ==` section in `readme.txt` (and `readme-es.txt`).
 3. Commit, then tag `vX.Y.Z` and push. `release.yml` refuses to build if the tag does not match all three files (see "GitHub Release").
 
-The current version is `1.0.0` in all three files.
+The current version is `1.0.1` in all three files.
 
 ## Build the installable ZIP
 
@@ -29,8 +29,8 @@ The distribution filter and archive layout match `.github/workflows/build.yml`. 
 ```sh
 mkdir -p build/rgpd-cookie-legal dist
 rsync -a --exclude-from=.distignore --exclude='build/' --exclude='.git/' ./ build/rgpd-cookie-legal/
-(cd build && zip -qr ../dist/rgpd-cookie-legal-1.0.0.zip rgpd-cookie-legal)
-unzip -l dist/rgpd-cookie-legal-1.0.0.zip
+(cd build && zip -qr ../dist/rgpd-cookie-legal-1.0.1.zip rgpd-cookie-legal)
+unzip -l dist/rgpd-cookie-legal-1.0.1.zip
 ```
 
 Change the ZIP filename when releasing another version. The archive contains one top-level `rgpd-cookie-legal/` directory. The build workflow runs on `main` pushes or manually and uploads `rgpd-cookie-legal.zip` as the `rgpd-cookie-legal` artifact; download and rename that artifact if you need the versioned filename.
@@ -47,11 +47,11 @@ WordPress.org SVN is the published release repository: commit only finished rele
 svn co https://plugins.svn.wordpress.org/rgpd-cookie-legal rgpd-cookie-legal-svn
 cd rgpd-cookie-legal-svn
 # Extract the verified install ZIP, then sync only its plugin directory to trunk.
-unzip -q /path/to/dist/rgpd-cookie-legal-1.0.0.zip -d /tmp/rgpd-release
+unzip -q /path/to/dist/rgpd-cookie-legal-1.0.1.zip -d /tmp/rgpd-release
 rsync -a --delete --exclude='.svn/' /tmp/rgpd-release/rgpd-cookie-legal/ trunk/
 svn add --force trunk
-svn cp trunk tags/1.0.0
-svn commit -m "Release 1.0.0"
+svn cp trunk tags/1.0.1
+svn commit -m "Release 1.0.1"
 ```
 
 Before committing, ensure `trunk/` contains the exact contents of the verified ZIP's `rgpd-cookie-legal/` folder. For later versions, update trunk and create the matching version tag. `.github/workflows/deploy.yml` automates this with `10up/action-wordpress-plugin-deploy`, but it is **disabled by default**: it only runs when the repository variable `WPORG_SVN_READY` is set to `true`. Once approved, add repository secrets `SVN_USERNAME` and `SVN_PASSWORD`, then set `WPORG_SVN_READY=true` to enable it. Until then, deploy using SVN manually.

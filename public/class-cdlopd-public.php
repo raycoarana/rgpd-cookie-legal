@@ -52,7 +52,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 			$exclude = $this->show_bar();
 			// Only do all this if post isn't excluded
 			if ( ! empty( $exclude ) ) {
-				wp_enqueue_style( 'cookie-consent-style', CDLOPD_PLUGIN_URL . 'assets/css/style.css', '2.3.0' );
+				wp_enqueue_style( 'cookie-consent-style', CDLOPD_PLUGIN_URL . 'assets/css/style.css', array(), '2.3.0' );
 				wp_enqueue_script( 'cookie-consent', CDLOPD_PLUGIN_URL . 'assets/js/click-datos-lopd-js.js', array( 'jquery' ), '2.3.0', true );
 				wp_localize_script(
 					'cookie-consent',
@@ -75,7 +75,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 			if ( isset( $post->ID ) ) {
 				$post_id  = $post->ID;
 				$excluded = get_post_meta( $post_id, 'cdlopd_exclude', true );
-				if ( $excluded == 1 && ! empty( $options['enable_metafield'] ) ) {
+				if ( 1 == $excluded && ! empty( $options['enable_metafield'] ) ) {
 					return false;
 				}
 			}
@@ -101,37 +101,37 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 					$cdlopd_content_settings['position'] = '';
 				}
 
-				if ( $cdlopd_content_settings['position'] == 'top-bar' ) {
+				if ( 'top-bar' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'position: fixed;
 					left: 0;
 					top: 0;
 					width: 100%;';
-				} elseif ( $cdlopd_content_settings['position'] == 'bottom-bar' ) {
+				} elseif ( 'bottom-bar' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'position: fixed;
 					left: 0;
 					bottom: 0;
 					width: 100%;';
-				} elseif ( $cdlopd_content_settings['position'] == 'top-right-block' ) {
+				} elseif ( 'top-right-block' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'position: fixed;
 					right: 20px;
 					top: 6%;
 					width: 300px;';
-				} elseif ( $cdlopd_content_settings['position'] == 'top-left-block' ) {
+				} elseif ( 'top-left-block' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'position: fixed;
 					left: 20px;
 					top: 6%;
 					width: 300px;';
-				} elseif ( $cdlopd_content_settings['position'] == 'bottom-left-block' ) {
+				} elseif ( 'bottom-left-block' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'position: fixed;
 					left: 20px;
 					bottom: 6%;
 					width: 300px;';
-				} elseif ( $cdlopd_content_settings['position'] == 'bottom-right-block' ) {
+				} elseif ( 'bottom-right-block' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'position: fixed;
 					right: 20px;
 					bottom: 6%;
 					width: 300px;';
-				} elseif ( $cdlopd_content_settings['position'] == 'bottom-center-block' ) {
+				} elseif ( 'bottom-center-block' == $cdlopd_content_settings['position'] ) {
 					$position_css = 'background: rgba(33,41,52,.85)!important;
     bottom: 0!important;
     display: flex;
@@ -147,17 +147,20 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 				if ( ! isset( $cdlopd_content_settings['text_color'] ) ) {
 					$cdlopd_content_settings['text_color'] = '';
 				}
-				$text_color = sanitize_hex_color( $cdlopd_content_settings['text_color'] ) ?: '#000000';
+				$text_color = sanitize_hex_color( $cdlopd_content_settings['text_color'] );
+				$text_color = $text_color ? $text_color : '#000000';
 
 				if ( ! isset( $cdlopd_content_settings['bg_color'] ) ) {
 					$cdlopd_content_settings['bg_color'] = '';
 				}
-				$bg_color = sanitize_hex_color( $cdlopd_content_settings['bg_color'] ) ?: '#ffffff';
+				$bg_color = sanitize_hex_color( $cdlopd_content_settings['bg_color'] );
+				$bg_color = $bg_color ? $bg_color : '#ffffff';
 
 				if ( ! isset( $cdlopd_content_settings['link_color'] ) ) {
 					$cdlopd_content_settings['link_color'] = '';
 				}
-				$link_color = sanitize_hex_color( $cdlopd_content_settings['link_color'] ) ?: '#000000';
+				$link_color = sanitize_hex_color( $cdlopd_content_settings['link_color'] );
+				$link_color = $link_color ? $link_color : '#000000';
 
 				if ( ! isset( $cdlopd_content_settings['grosor_border'] ) ) {
 					$cdlopd_content_settings['grosor_border'] = '';
@@ -167,28 +170,33 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 				if ( ! isset( $cdlopd_content_settings['color_border'] ) ) {
 					$cdlopd_content_settings['color_border'] = '';
 				}
-				$color_border = sanitize_hex_color( $cdlopd_content_settings['color_border'] ) ?: '#000000';
+				$color_border = sanitize_hex_color( $cdlopd_content_settings['color_border'] );
+				$color_border = $color_border ? $color_border : '#000000';
 
 				//Agrega los colores para el boton aceptar
 				if ( ! isset( $cdlopd_content_settings['button_bg_color_aceptar'] ) ) {
 					$cdlopd_content_settings['button_bg_color_aceptar'] = '#90CD0D';
 				}
-				$button_bg_aceptar = sanitize_hex_color( $cdlopd_content_settings['button_bg_color_aceptar'] ) ?: '#90cd0d';
+				$button_bg_aceptar = sanitize_hex_color( $cdlopd_content_settings['button_bg_color_aceptar'] );
+				$button_bg_aceptar = $button_bg_aceptar ? $button_bg_aceptar : '#90cd0d';
 
 				if ( ! isset( $cdlopd_content_settings['button_color_aceptar'] ) ) {
 					$cdlopd_content_settings['button_color_aceptar'] = '#fff';
 				}
-				$button_color_aceptar = sanitize_hex_color( $cdlopd_content_settings['button_color_aceptar'] ) ?: '#ffffff';
+				$button_color_aceptar = sanitize_hex_color( $cdlopd_content_settings['button_color_aceptar'] );
+				$button_color_aceptar = $button_color_aceptar ? $button_color_aceptar : '#ffffff';
 				//Agrega los colores para el boton rechazar
 				if ( ! isset( $cdlopd_content_settings['button_bg_color_rechazar'] ) ) {
 					$cdlopd_content_settings['button_bg_color_rechazar'] = '#CD0D0D';
 				}
-				$button_bg_rechazar = sanitize_hex_color( $cdlopd_content_settings['button_bg_color_rechazar'] ) ?: '#cd0d0d';
+				$button_bg_rechazar = sanitize_hex_color( $cdlopd_content_settings['button_bg_color_rechazar'] );
+				$button_bg_rechazar = $button_bg_rechazar ? $button_bg_rechazar : '#cd0d0d';
 
 				if ( ! isset( $cdlopd_content_settings['button_color_rechazar'] ) ) {
 					$cdlopd_content_settings['button_color_rechazar'] = '#fff';
 				}
-				$button_color_rechazar = sanitize_hex_color( $cdlopd_content_settings['button_color_rechazar'] ) ?: '#ffffff';
+				$button_color_rechazar = sanitize_hex_color( $cdlopd_content_settings['button_color_rechazar'] );
+				$button_color_rechazar = $button_color_rechazar ? $button_color_rechazar : '#ffffff';
 
 				if ( ! isset( $cdlopd_content_settings['duracion_cookie_aceptar'] ) ) {
 					$cdlopd_content_settings['duracion_cookie_aceptar'] = '';
@@ -263,7 +271,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 				if ( ! isset( $cdlopd_content_settings['position'] ) ) {
 					$cdlopd_content_settings['position'] = '';
 				}
-				if ( $cdlopd_content_settings['position'] == 'top-bar' || $cdlopd_content_settings['position'] == 'bottom-bar' ) {
+				if ( 'top-bar' == $cdlopd_content_settings['position'] || 'bottom-bar' == $cdlopd_content_settings['position'] ) {
 					$type = 'bar';
 				} else {
 					$type = 'block';
@@ -272,26 +280,13 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 
 				<script type="text/javascript">
 					jQuery(document).ready(function ($) {
-						if (catapultReadCookie('catAccCookies') || catapultReadCookie("catAccCookiesDeny") /*|| catapultReadCookie("catAccCookiesUnan")*/) {
+						if (catapultReadCookie('catAccCookies') || catapultReadCookie("catAccCookiesDeny")) {
 
 						} else {
 							$("body").addClass("has-cookie-bar");
 							$("body").addClass("cookie-bar-<?php echo esc_attr( $type ); ?>");
 						}
 
-//                        if (catapultReadCookie('catAccCookies') || catapultReadCookie("catAccCookiesDeny")) {
-//
-//                        } else {
-//                            setTimeout("cookiesinaceptarnirechazar()", 30000);
-//                        }
-//
-//                        if (catapultReadCookie("catAccCookiesUnan")) {
-//                            setTimeout(function () {
-//                                $("body").addClass("has-cookie-bar");
-//                                $("body").addClass("cookie-bar-<?php //echo $type; ?>");
-//                                setTimeout("cookiesinaceptarnirechazar()", 30000);
-//                            }, 300000);
-//                        }
 					});
 				</script>
 
@@ -318,7 +313,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 					$cdlopd_content_settings['position'] = '';
 				}
 
-				if ( $cdlopd_content_settings['position'] == 'top-bar' || $cdlopd_content_settings['position'] == 'bottom-bar' ) {
+				if ( 'top-bar' == $cdlopd_content_settings['position'] || 'bottom-bar' == $cdlopd_content_settings['position'] ) {
 					$is_block = false; // It's a bar
 				}
 
@@ -350,19 +345,19 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 				$content = '<div id="catapult-cookie-bar" class="' . $classes . '">';
 
 				// Add a custom wrapper class if specified
-				if ( $cdlopd_content_settings['position'] == 'top-bar' || $cdlopd_content_settings['position'] == 'bottom-bar' ) {
+				if ( 'top-bar' == $cdlopd_content_settings['position'] || 'bottom-bar' == $cdlopd_content_settings['position'] ) {
 					$content      .= '<div class="cdlopd-inner ">';
 					$close_content = '</div><!-- custom wrapper class -->';
 				}
 
-				if ( $cdlopd_content_settings['position'] == 'bottom-center-block' ) {
+				if ( 'bottom-center-block' == $cdlopd_content_settings['position'] ) {
 					$content      .= '<div id="rgpd-intrusivo">';
 					$close_content = '</div><!-- cerramos rgpd intrusivo -->';
 
 				}
 
 				// Add a title if it's a block
-				if ( $cdlopd_content_settings['position'] != 'top-bar' && $cdlopd_content_settings['position'] != 'bottom-bar' && $cdlopd_content_settings['position'] != 'bottom-center-block' ) {
+				if ( 'top-bar' != $cdlopd_content_settings['position'] && 'bottom-bar' != $cdlopd_content_settings['position'] && 'bottom-center-block' != $cdlopd_content_settings['position'] ) {
 					$heading_text = wp_kses( $cdlopd_content_settings['heading_text'], $allowed );
 					$heading_text = apply_filters( 'cdlopd_heading_text', $heading_text );
 					$content     .= sprintf(
@@ -371,7 +366,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 					);
 				}
 
-				if ( $cdlopd_content_settings['position'] == 'bottom-center-block' ) {
+				if ( 'bottom-center-block' == $cdlopd_content_settings['position'] ) {
 					$heading_text = wp_kses( $cdlopd_content_settings['heading_text'], $allowed );
 					$heading_text = apply_filters( 'cdlopd_heading_text', $heading_text );
 
@@ -416,7 +411,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 				if ( $cdlopd_content_settings['opcion_cookie'] ) {
 					$opcion_cookie = wp_kses( $cdlopd_content_settings['opcion_cookie'], $allowed );
 					$opcion_cookie = apply_filters( 'cdlopd_opcion_cookie', $opcion_cookie );
-					if ( $opcion_cookie === 'botones' ) {
+					if ( 'botones' === $opcion_cookie ) {
 						$accept_text = wp_kses( $cdlopd_content_settings['accept_text'], $allowed );
 						$accept_text = apply_filters( 'cdlopd_accept_text', $accept_text );
 						//recoge el valor de la duración de la cookie para asignárselo cuando se de click al botón de Aceptar
@@ -440,7 +435,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 							$duracion_cookie_rechazar,
 							$deny_text
 						);
-					} elseif ( $opcion_cookie === 'scroll' ) {
+					} elseif ( 'scroll' === $opcion_cookie ) {
 						$accept_text              = wp_kses( $cdlopd_content_settings['accept_text'], $allowed );
 						$accept_text              = apply_filters( 'cdlopd_accept_text', $accept_text );
 						$duracion_cookie_aceptar  = wp_kses( $cdlopd_content_settings['duracion_cookie_aceptar'], $allowed );
@@ -479,7 +474,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 				if ( get_post_meta( 11122, 'sheader', true ) == true || get_post_meta( 11123, 'sfooter', true ) == true ) {
 					$notification_text = wp_kses_post( do_shortcode( $cdlopd_content_settings['notification_text'] ) );
 					$notification_text = apply_filters( 'cdlopd_notification_text', $notification_text );
-					if ( $cdlopd_content_settings['position'] == 'bottom-center-block' ) {
+					if ( 'bottom-center-block' == $cdlopd_content_settings['position'] ) {
 						$content .= sprintf(
 							'<span class="cdlopd-left-side rgpd-texto-centro ">%s %s</span><span class="cdlopd-right-side rgpd-texto-centro">%s %s %s</span>',
 							$notification_text,
@@ -522,7 +517,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 		}
 
 		public function check_cookies_header() {
-			if ( isset( $_COOKIE['catAccCookies'] ) && $_COOKIE['catAccCookies'] == 1 ) {
+			if ( isset( $_COOKIE['catAccCookies'] ) && 1 == $_COOKIE['catAccCookies'] ) {
 				if ( get_post_meta( 11122, 'sheader', true ) == true ) {
 					$scriptsheader = get_post_meta( 11122, 'sheader', true );
                     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentionally outputs administrator-configured script blocks after consent.
@@ -532,7 +527,7 @@ if ( ! class_exists( 'CDLOPD_Public' ) ) { // Don't initialise if there's alread
 		}
 
 		public function check_cookies_footer() {
-			if ( isset( $_COOKIE['catAccCookies'] ) && $_COOKIE['catAccCookies'] == 1 ) {
+			if ( isset( $_COOKIE['catAccCookies'] ) && 1 == $_COOKIE['catAccCookies'] ) {
 				if ( get_post_meta( 11123, 'sfooter', true ) == true ) {
 					$scriptsfooter = get_post_meta( 11123, 'sfooter', true );
                     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentionally outputs administrator-configured script blocks after consent.

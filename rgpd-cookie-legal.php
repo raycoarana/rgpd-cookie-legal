@@ -3,7 +3,7 @@
 Plugin Name: RGPD Cookies y Páginas Legales
 Plugin URI: https://github.com/raycoarana/rgpd-cookie-legal
 Description: Mantenimiento del plugin abandonado "Protección de Datos RGPD" (RGPD LOPD). Páginas legales, banner de cookies, cláusulas legales. Fork parcheado de seguridad.
-Version: 1.0.0
+Version: 1.0.1
 Author: raycoarana
 Author URI: https://github.com/raycoarana
 Text Domain: click-datos-lopd
@@ -36,15 +36,15 @@ if ( ! defined( 'CDLOPD_PLUGIN_URL' ) ) {
 
 if ( is_admin() ) {
 	require_once __DIR__ . '/admin/class-cdlopd-admin.php';
-	$CDLOPD_Admin = new CDLOPD_Admin();
-	$CDLOPD_Admin->init();
+	$cdlopd_admin = new CDLOPD_Admin();
+	$cdlopd_admin->init();
 
 
 
 } else {
 	require_once __DIR__ . '/public/class-cdlopd-public.php';
-	$CDLOPD_Public = new CDLOPD_Public();
-	$CDLOPD_Public->init();
+	$cdlopd_public = new CDLOPD_Public();
+	$cdlopd_public->init();
 }
 require_once __DIR__ . '/public/customizer.php';
 

@@ -34,10 +34,8 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 		/**
 		 *
 		 */
-		function my_error_notice() {
-			if ( ! empty( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] != 'off' ) {
-
-			} else {
+		public function my_error_notice() {
+			if ( ! empty( $_SERVER['HTTPS'] ) && 'off' != $_SERVER['HTTPS'] ) {
 				?>
 				<script type="text/javascript">
 				function catapultSetCookie(cookieName, cookieValue, nDays) {
@@ -67,7 +65,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 			}
 		}
 
-		function formulario_sin() {
+		public function formulario_sin() {
 			$forms             = '';
 			$args              = array(
 				'post_type' => 'wpcf7_contact_form',
@@ -80,13 +78,11 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 				while ( $the_query->have_posts() ) :
 					$the_query->the_post();
 					$cadena = get_post_meta( $the_query->post->ID, '_form', true );
-					if ( stripos( $cadena, 'acceptance acceptance-279' ) ) {
-
-					} else {
-						if ( $contadorclausulas == 0 ) {
+					if ( false === stripos( $cadena, 'acceptance acceptance-279' ) ) {
+						if ( 0 === $contadorclausulas ) {
 							$forms .= '<strong>' . esc_html( get_the_title() ) . '</strong>';
 						} else {
-							$forms .= '<strong>' . ', ' . esc_html( get_the_title() ) . '</strong> ';
+							$forms .= '<strong>, ' . esc_html( get_the_title() ) . '</strong> ';
 							++$contadorplural;
 						}
 						++$contadorclausulas;
@@ -94,8 +90,8 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 				endwhile;
 			endif;
 
-			if ( $forms == ! '' ) {
-				if ( $contadorplural == 0 ) {
+			if ( '' !== $forms ) {
+				if ( 0 === $contadorplural ) {
 					$mensaje = 'Usted no tiene la cláusula obligatoria de tratamiento de información en el siguiente formulario: ' . $forms;
 				} else {
 					$mensaje = 'Usted no tiene la cláusula obligatoria de tratamiento de información en los siguientes formularios: ' . $forms;
@@ -137,7 +133,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 		/**
 		 *
 		 */
-		function cookie_sin_registrar() {
+		public function cookie_sin_registrar() {
 			$ncookies = 0;
 			foreach ( $_COOKIE as $key ) {
 				++$ncookies;
@@ -223,8 +219,9 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 
 		public function enqueue_scripts() {
 			wp_enqueue_style( 'wp-color-picker' );
-			wp_enqueue_script( 'wp-color-picker', false, array( 'jquery' ) );
-			wp_enqueue_style( 'cdlopd-admin-style', CDLOPD_PLUGIN_URL . 'assets/css/admin-style.css' );
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion -- false uses the WordPress core-registered script version.
+			wp_enqueue_script( 'wp-color-picker', false, array( 'jquery' ), false, false );
+			wp_enqueue_style( 'cdlopd-admin-style', CDLOPD_PLUGIN_URL . 'assets/css/admin-style.css', array(), '1.0.0' );
 
 			// JS
 			wp_register_script( 'prefix_bootstrap', CDLOPD_PLUGIN_URL . 'assets/js/bootstrap.min.js', array( 'jquery' ), '3.3.7', true );
@@ -235,7 +232,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 			wp_enqueue_style( 'prefix_bootstrap' );
 
 			// CSS toogle
-			wp_register_style( 'prefix_bootstrap_toogle', CDLOPD_PLUGIN_URL . 'assets/css/bootstrap-toggle.min.css' );
+			wp_register_style( 'prefix_bootstrap_toogle', CDLOPD_PLUGIN_URL . 'assets/css/bootstrap-toggle.min.css', array(), '2.2.0' );
 			wp_enqueue_style( 'prefix_bootstrap_toogle' );
 
 			// JS toogle
@@ -258,15 +255,15 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 
 			add_menu_page( __( 'RGPD Cookies y Páginas Legales', 'click-datos-lopd' ), __( 'RGPD Cookies y Páginas Legales', 'click-datos-lopd' ), 'manage_options', 'cdlopd1', array( $this, 'inicio' ) );
 
-			add_submenu_page( 'cdlopd1', 'Páginas', 'Páginas', 'manage_options', __FILE__ . '/custom3', 'paginaslodp' );
+			add_submenu_page( 'cdlopd1', 'Páginas', 'Páginas', 'manage_options', 'cdlopd1-custom3', 'paginaslodp' );
 
-			add_submenu_page( 'cdlopd1', 'Formularios', 'Formularios', 'manage_options', __FILE__ . '/custom2', 'clivern_render_custom_page' );
+			add_submenu_page( 'cdlopd1', 'Formularios', 'Formularios', 'manage_options', 'cdlopd1-custom2', 'clivern_render_custom_page' );
 
-			add_submenu_page( 'cdlopd1', 'Cookies', 'Cookies', 'manage_options', __FILE__ . '/custom1', array( $this, 'options_page' ) );
+			add_submenu_page( 'cdlopd1', 'Cookies', 'Cookies', 'manage_options', 'cdlopd1-custom1', array( $this, 'options_page' ) );
 
-			add_submenu_page( 'cdlopd1', 'Precarga de cookies', 'Precarga de cookies', 'manage_options', __FILE__ . '/custom4', 'CookiesParaRechazar' );
+			add_submenu_page( 'cdlopd1', 'Precarga de cookies', 'Precarga de cookies', 'manage_options', 'cdlopd1-custom4', 'cookies_para_rechazar' );
 
-			function CookiesParaRechazar() {
+			function cookies_para_rechazar() {
 				?>
 				<?php
 				$cu = wp_get_current_user();
@@ -388,7 +385,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 					</div>
 					<div class="cdlopd-inner-wrap">
 						<p style="margin: 2%;">En esta sección, usted deberá añadir los codigos script de aquellas cookies, propias o de terceros, que no sean las básicas para el correcto funcionamiento de la página web. Estas cookies NO serán cargadas por defecto, mientras el usuario no pinche en el botón de "Aceptar" cookies; si pulsa en el botón "Rechazar", nunca serán cargadas. Si cuenta con algún plugin que añada la cookie automáticamente, desinstálelo y añada el script en una de estas dos áreas de texto.</p>
-						<form method="post" action="?page=click-datos-lopd%2Fadmin%2Fclass-cdlopd-admin.php%2Fcustom4&que=1">
+						<form method="post" action="?page=cdlopd1-custom4&amp;que=1">
 							<?php
 							wp_nonce_field( 'cdlopd_save_scripts' );
 							$sheaderdatabase = get_post_meta( 11122 );
@@ -446,7 +443,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 					$sfooterdatabase = get_post_meta( $sfooterid, 'sfooter', true );
 
 					//header
-					if ( $sheaderdatabase || $sheaderdatabase == '' ) {
+					if ( $sheaderdatabase || '' == $sheaderdatabase ) {
 						if ( is_null( $sheader ) ) {
 							delete_post_meta( $sheaderid, 'sheader' );
 						} else {
@@ -456,7 +453,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 						add_post_meta( $sheaderid, 'sheader', $sheader, true );
 					}
 					//footer
-					if ( $sfooterdatabase || $sfooterdatabase == '' ) {
+					if ( $sfooterdatabase || '' == $sfooterdatabase ) {
 						if ( is_null( $sfooter ) ) {
 							delete_post_meta( $sfooterid, 'sfooter' );
 						} else {
@@ -478,7 +475,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 					$busqueda = isset( $_POST['busqueda'] ) ? sanitize_text_field( wp_unslash( $_POST['busqueda'] ) ) : '';
 				}
 
-				if ( isset( $_POST['eliminarbusqueda'] ) && $_POST['eliminarbusqueda'] == '&times;' ) {
+				if ( isset( $_POST['eliminarbusqueda'] ) && '&times;' == $_POST['eliminarbusqueda'] ) {
 					if ( isset( $busqueda ) ) {
 						unset( $busqueda );
 					}
@@ -486,16 +483,35 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 
 				//AQUI EMPIEZA EL SELECTOR DE INSERCION DE CLAUSULAS RGPD EN CONTACT FORM//
 
-				if ( isset( $_POST['action'] ) && $_POST['action'] == 'Escribir cláusulas' ) {
+				if ( isset( $_POST['action'] ) && 'Escribir cláusulas' == $_POST['action'] ) {
 					check_admin_referer( 'cdlopd_escribir_clausulas' );
 
-					$formularios = isset( $_POST['formularios'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['formularios'] ) ) : array();
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each scalar is validated against numeric IDs or the sentinel allowlist below before use.
+					$submitted_formularios = isset( $_POST['formularios'] ) && is_array( $_POST['formularios'] ) ? wp_unslash( $_POST['formularios'] ) : array();
+					$formularios           = array();
+					$formulario_ids         = array();
+					foreach ( $submitted_formularios as $formulario ) {
+						if ( ! is_scalar( $formulario ) ) {
+							continue;
+						}
+
+						if ( is_int( $formulario ) || ( is_string( $formulario ) && ctype_digit( $formulario ) ) ) {
+							$formulario_id = absint( $formulario );
+							if ( 0 < $formulario_id ) {
+								$formularios[]   = $formulario_id;
+								$formulario_ids[] = $formulario_id;
+							}
+						} elseif ( is_string( $formulario ) && preg_match( '/^(mayores|comerciales)([1-9][0-9]*)$/', $formulario, $matches ) ) {
+							$formularios[]    = sanitize_text_field( $formulario );
+							$formulario_ids[] = absint( $matches[2] );
+						}
+					}
 
 					if ( isset( $formularios ) ) {
 						$query = new WP_Query(
 							array(
 								'post_type' => 'wpcf7_contact_form',
-								'post__in'  => $formularios,
+								'post__in'  => $formulario_ids,
 							)
 						);
 
@@ -511,28 +527,26 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 								$texto2    = '<br><span>[acceptance acceptance-414 default:off] Declaro, bajo mi propia responsabilidad, ser mayor de 18 años y respondo de manera exclusiva de la veracidad de dicha declaración.</span><br>';
 								$texto3    = '<br><span>[acceptance acceptance-415 default:off] Acepto recibir la información que la entidad considere oportuno enviarme por correo electrónico o medio de comunicación electrónica equivalente. (Es posible darse de baja en cualquier momento).</span><br>';
 
-								if ( in_array( $pp, $formularios ) ) {
-									if ( strpos( $cadena, $texto1 ) == false ) {
+								if ( in_array( $pp, $formularios, true ) ) {
+									if ( false === strpos( $cadena, $texto1 ) ) {
 										$texto .= $texto1;
 									}
 								}
-								if ( in_array( 'mayores' . $pp, $formularios ) ) {
-									if ( strpos( $cadena, $texto2 ) == false ) {
+								if ( in_array( 'mayores' . $pp, $formularios, true ) ) {
+									if ( false === strpos( $cadena, $texto2 ) ) {
 										$texto .= $texto2;
 									}
 								}
-								if ( in_array( 'comerciales' . $pp, $formularios ) ) {
-									if ( strpos( $cadena, $texto3 ) == false ) {
+								if ( in_array( 'comerciales' . $pp, $formularios, true ) ) {
+									if ( false === strpos( $cadena, $texto3 ) ) {
 										$texto .= $texto3;
 									}
 								}
-								$cdefinitiva = $spcadenas[0] . '' . $texto . '[submit' . $spcadenas[1];
+								$cdefinitiva = $spcadenas[0] . $texto . '[submit' . $spcadenas[1];
 								update_post_meta( $pp, '_form', $cdefinitiva );
 							endwhile;
 							wp_reset_postdata();
 							echo( "<div class='updated message' style='padding: 10px'>Se ha incorporado las cláusulas a tu formulario.</div>" );
-						else :
-
 						endif;
 					} else {
 						echo ( "<div class='updated message' style='padding: 10px'>Selecciona un formulario al que escribir las cláusulas.</div>" );
@@ -572,14 +586,11 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 							}
 
 							$spcadenas   = explode( $texto, $cadena );
-							$cdefinitiva = $spcadenas[0] . '' . $spcadenas[1];
+							$cdefinitiva = $spcadenas[0] . $spcadenas[1];
 							update_post_meta( $pp, '_form', $cdefinitiva );
 						endwhile;
 						wp_reset_postdata();
 						echo( "<div class='updated message' style='padding: 10px'>Se han eliminado las cláusulas a tu formulario.</div>" );
-
-					else :
-
 					endif;
 				}
 				$cu = wp_get_current_user();
@@ -730,7 +741,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 									if ( isset( $busqueda ) ) {
 										global $wpdb;
 										$mypostids = $wpdb->get_col( $wpdb->prepare( "select ID from $wpdb->posts where post_title LIKE %s", $wpdb->esc_like( $busqueda ) . '%' ) );
-										if ( $mypostids == ! 0 ) {
+										if ( ! empty( $mypostids ) ) {
 											$args = array(
 												'post_type' => 'wpcf7_contact_form',
 												'post__in' => $mypostids,
@@ -855,7 +866,7 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 					wp_die( esc_html__( 'No autorizado.', 'click-datos-lopd' ) );
 				}
 				/* AQUI EMPIEZA LA CREACIÓN DE PAGINAS RGPD */
-				if ( isset( $_POST['crearpagina'] ) && $_POST['crearpagina'] == 'Si' ) {
+				if ( isset( $_POST['crearpagina'] ) && 'Si' == $_POST['crearpagina'] ) {
 					check_admin_referer( 'cdlopd_crear_pagina' );
 
 					global $reg_errors;
@@ -886,21 +897,21 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 					//Comprobamos que código postal tenga una longitud de 5 caracteres
 					//Validacion campos
 					if ( get_option( 'lopdwidget', false ) == false ) {
-						add_option( 'lopdwidget', 'true', null, false );
-						add_option( 'lopdwidget_empresa', $empresaclickdatos, null, false );
-						add_option( 'lopdwidget_razon', $razonclickdatos, null, false );
-						add_option( 'lopdwidget_titular', $titularclickdatos, null, false );
-						add_option( 'lopdwidget_domicilio', $domicilioclickdatos, null, false );
-						add_option( 'lopdwidget_poblacion', $poblacionclickdatos, null, false );
-						add_option( 'lopdwidget_provincia', $provinciaclickdatos, null, false );
-						add_option( 'lopdwidget_cp', $cpclickdatos, null, false );
-						add_option( 'lopdwidget_cif', $cifclickdatos, null, false );
-						add_option( 'lopdwidget_telefono', $telefonoclickdatos, null, false );
-						add_option( 'lopdwidget_email', $emailclickdatos, null, false );
-						add_option( 'lopdwidget_datos', $datosclickdatos, null, false );
+						add_option( 'lopdwidget', 'true', '', false );
+						add_option( 'lopdwidget_empresa', $empresaclickdatos, '', false );
+						add_option( 'lopdwidget_razon', $razonclickdatos, '', false );
+						add_option( 'lopdwidget_titular', $titularclickdatos, '', false );
+						add_option( 'lopdwidget_domicilio', $domicilioclickdatos, '', false );
+						add_option( 'lopdwidget_poblacion', $poblacionclickdatos, '', false );
+						add_option( 'lopdwidget_provincia', $provinciaclickdatos, '', false );
+						add_option( 'lopdwidget_cp', $cpclickdatos, '', false );
+						add_option( 'lopdwidget_cif', $cifclickdatos, '', false );
+						add_option( 'lopdwidget_telefono', $telefonoclickdatos, '', false );
+						add_option( 'lopdwidget_email', $emailclickdatos, '', false );
+						add_option( 'lopdwidget_datos', $datosclickdatos, '', false );
 					} else {
-						add_option( 'lopdwidget', 'true', null, false );
-						add_option( 'lopdwidget_razon', $razonclickdatos, null, false );
+						add_option( 'lopdwidget', 'true', '', false );
+						add_option( 'lopdwidget_razon', $razonclickdatos, '', false );
 						update_option( 'lopdwidget_empresa', $empresaclickdatos, false );
 						update_option( 'lopdwidget_titular', $titularclickdatos, false );
 						update_option( 'lopdwidget_domicilio', $domicilioclickdatos, false );
@@ -931,11 +942,11 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 						$cookies                 .= '</tr>';
 						++$i;
 						if ( get_option( 'lopdwidget_cookie_' . $cookieusuarionombre, false ) == false ) {
-							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre, $cookieusuarionombre, null, false );
-							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_categoria', $cookieusuariocategoria, null, false );
-							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_descripcion', $cookieusuariodescripcion, null, false );
-							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_propiedad', $cookieusuariopropiedad, null, false );
-							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_duracion', $cookieusuarioduracion, null, false );
+							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre, $cookieusuarionombre, '', false );
+							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_categoria', $cookieusuariocategoria, '', false );
+							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_descripcion', $cookieusuariodescripcion, '', false );
+							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_propiedad', $cookieusuariopropiedad, '', false );
+							add_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_duracion', $cookieusuarioduracion, '', false );
 						} else {
 							update_option( 'lopdwidget_cookie_' . $cookieusuarionombre, $cookieusuarionombre, false );
 							update_option( 'lopdwidget_cookie_' . $cookieusuarionombre . '_categoria', $cookieusuariocategoria, false );
@@ -945,32 +956,32 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 						}
 					}
 					if ( get_option( 'lopdwidget_cookie_contador', false ) === false ) {
-						add_option( 'lopdwidget_cookie_contador', $i, null, false );
+						add_option( 'lopdwidget_cookie_contador', $i, '', false );
 					} else {
 						update_option( 'lopdwidget_cookie_contador', $i, false );
 					}
 
-					if ( $empresaclickdatos == '' ) {
+					if ( '' === $empresaclickdatos ) {
 						$reg_errors->add( 'invalid-nombreempresa', "<div class='error message' style='padding: 10px'>Rellene el Nombre de la empresa.</div>" );
 					}
 
-					if ( $razonclickdatos == '' ) {
+					if ( '' === $razonclickdatos ) {
 						$reg_errors->add( 'invalid-nombrerazon', "<div class='error message' style='padding: 10px'>Rellene la Razón Social de la empresa.</div>" );
 					}
 
-					if ( $titularclickdatos == '' ) {
+					if ( '' === $titularclickdatos ) {
 						$reg_errors->add( 'invalid-nombretitular', "<div class='error message' style='padding: 10px'>Rellene el Nombre del titular.</div>" );
 					}
 
-					if ( $domicilioclickdatos == '' ) {
+					if ( '' === $domicilioclickdatos ) {
 						$reg_errors->add( 'invalid-domicilio', "<div class='error message' style='padding: 10px'>Rellene la dirección de la empresa.</div>" );
 					}
 
-					if ( $poblacionclickdatos == '' ) {
+					if ( '' === $poblacionclickdatos ) {
 						$reg_errors->add( 'invalid-poblacion', "<div class='error message' style='padding: 10px'>Rellene la poblacion de la empresa.</div>" );
 					}
 
-					if ( $provinciaclickdatos == '' ) {
+					if ( '' === $provinciaclickdatos ) {
 						$reg_errors->add( 'invalid-provincia', "<div class='error message' style='padding: 10px'>Rellene la provincia de la empresa.</div>" );
 					}
 
@@ -983,14 +994,14 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 					}
 
 					$telefono = isset( $_POST['telefono'] ) ? intval( $_POST['telefono'] ) : 0;
-					if ( strlen( $telefono ) != 9 ) {
+					if ( strlen( $telefono ) !== 9 ) {
 						$reg_errors->add( 'invalid-telefono', "<div class='error message' style='padding: 10px'>El telefono debe tener 9 digitos</div>" );
 					}
 
 					$cp      = isset( $_POST['cp'] ) ? sanitize_text_field( wp_unslash( $_POST['cp'] ) ) : '';
 					$cpostal = ctype_digit( $cp );
 
-					if ( strlen( $cp ) != 5 || $cpostal == false ) {
+					if ( strlen( $cp ) !== 5 || false === $cpostal ) {
 						$reg_errors->add( 'invalid-postalcode', "<div class='error message' style='padding: 10px'>El código postal debe tener 5 digitos</div>" );
 					}
 
@@ -1045,7 +1056,8 @@ if ( ! class_exists( 'CDLOPD_Admin' ) ) {
 						} else {
 							// Creamos la pagina Avisos legales
 							$pagenameal = __( 'Avisos Legales', 'click-datos-lopd' );
-							$cpageal    = get_page_by_title( $pagenameal ); // Comprobamos si existe la pagina
+							// phpcs:ignore WordPress.WP.DeprecatedFunctions.get_page_by_titleFound -- Required for WordPress 4.7 compatibility; get_posts() title queries require newer WordPress.
+							$cpageal = get_page_by_title( $pagenameal ); // Comprobamos si existe la pagina
 							if ( ! $cpageal ) {
 								//si no existe la creamos
 								$pageal['post_type']    = 'page';
@@ -1149,7 +1161,8 @@ Puede encontrar información sobre cómo configurar los navegadores más usados 
 						} else {
 							// Creamos la pagina Politica de Cookies
 							$pagenamepc = __( 'Política de Cookies', 'click-datos-lopd' );
-							$cpagepc    = get_page_by_title( $pagenamepc ); // Comprobamos si existe la pagina
+							// phpcs:ignore WordPress.WP.DeprecatedFunctions.get_page_by_titleFound -- Required for WordPress 4.7 compatibility; get_posts() title queries require newer WordPress.
+							$cpagepc = get_page_by_title( $pagenamepc ); // Comprobamos si existe la pagina
 							if ( ! $cpagepc ) {
 								//si no existe la creamos
 								$pagepc['post_type']    = 'page';
@@ -1238,7 +1251,8 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 						} else {
 							// Creamos la pagina Politica de Privacidad
 							$pagenamepp = __( 'Política de Privacidad', 'click-datos-lopd' );
-							$cpagepp    = get_page_by_title( $pagenamepp ); // Comprobamos si existe la pagina
+							// phpcs:ignore WordPress.WP.DeprecatedFunctions.get_page_by_titleFound -- Required for WordPress 4.7 compatibility; get_posts() title queries require newer WordPress.
+							$cpagepp = get_page_by_title( $pagenamepp ); // Comprobamos si existe la pagina
 							if ( ! $cpagepp ) {
 								//si no existe la creamos
 								$pagepp['post_type']    = 'page';
@@ -1469,7 +1483,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 													$i = 0;
 													foreach ( $_COOKIE as $key => $value ) {
 														$resultado = strpos( (string) $key, (string) $cookie->nombre );
-														if ( $resultado !== false && $i == 0 ) {
+														if ( false !== $resultado && 0 === $i ) {
 															if ( get_option( 'lopdwidget_cookie_' . $cookie->nombre, false ) ) {
 																$cookiea = array(
 																	'nombre' => sanitize_text_field( get_option( 'lopdwidget_cookie_' . $cookie->nombre, false ) ),
@@ -1506,7 +1520,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 												foreach ( $_COOKIE as $key => $value ) {
 													$keys      = substr( $key, 0, 10 );
 													$resultado = strpos( (string) $arraycookiesstring, (string) $keys );
-													if ( $resultado === false ) {
+													if ( false === $resultado ) {
 														if ( get_option( 'lopdwidget_cookie_' . $key, false ) ) {
 															$cookiea = array(
 																'nombre' => sanitize_text_field( get_option( 'lopdwidget_cookie_' . $key, false ) ),
@@ -1555,14 +1569,14 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 														//a continuación comprueba las que empiezan por wordpress_ para que no aparezcan en la tabla
 														$pos = strpos( $cookie['nombre'], 'wordpress_' );
 
-														if ( $pos !== 0 ) {
+														if ( 0 !== $pos ) {
 															?>
 																<tr align="center">
 																	<td style="border: 1px solid #ff6f00!important;">
 																		<label style="width: 100%!important;">
 																		<?php
 																		echo esc_html( $cookie['nombre'] ) . '<br>';
-																		if ( $cookie['descripcion'] === 'Desconocemos el origen de la cookie' ) {
+																		if ( 'Desconocemos el origen de la cookie' === $cookie['descripcion'] ) {
 																			?>
 																				<input type="button" value="¿Saber más?" class="btn btn-warning" onclick="window.open('https://www.aepd.es/', '_blank')" />
 																			<?php
@@ -1575,21 +1589,21 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 																		<select style="width: 100%!important;" id="categoria<?php echo esc_attr( $i ); ?>" name="categoria<?php echo esc_attr( $i ); ?>">
 																			<option value="Funcionalidad"
 																			<?php
-																			if ( $cookie['categoria'] == 'Funcionalidad' ) {
+																			if ( 'Funcionalidad' == $cookie['categoria'] ) {
 																				echo 'selected="selected"';
 																			}
 																			?>
 																			>Funcionalidad</option>
 																			<option value="Análisis"
 																			<?php
-																			if ( $cookie['categoria'] == 'Análisis' ) {
+																			if ( 'Análisis' == $cookie['categoria'] ) {
 																				echo 'selected="selected"';
 																			}
 																			?>
 																			>Análisis</option>
 																			<option value="Publicidad"
 																			<?php
-																			if ( $cookie['categoria'] == 'Publicidad' ) {
+																			if ( 'Publicidad' == $cookie['categoria'] ) {
 																				echo 'selected="selected"';
 																			}
 																			?>
@@ -1603,14 +1617,14 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 																		<select style="width: 100%!important;" id="propiedad<?php echo esc_attr( $i ); ?>" name="propiedad<?php echo esc_attr( $i ); ?>">
 																			<option value="Terceros"
 																			<?php
-																			if ( $cookie['propiedad'] == 'Terceros' ) {
+																			if ( 'Terceros' == $cookie['propiedad'] ) {
 																				echo 'selected="selected"';
 																			}
 																			?>
 																			>Terceros</option>
 																			<option value="Propia"
 																			<?php
-																			if ( $cookie['propiedad'] == 'Propia' ) {
+																			if ( 'Propia' == $cookie['propiedad'] ) {
 																				echo 'selected="selected"';
 																			}
 																			?>
@@ -1665,9 +1679,9 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 			$output = array();
 			foreach ( $input as $key => $value ) {
 				if ( isset( $input[ $key ] ) ) {
-					if ( $key == 'notification_text' ) {
+					if ( 'notification_text' == $key ) {
 						$output[ $key ] = esc_attr( $input[ $key ] );
-					} elseif ( $key == 'more_info_url' ) {
+					} elseif ( 'more_info_url' == $key ) {
 						$output[ $key ] = esc_url( $input[ $key ] );
 					} else {
 						$output[ $key ] = sanitize_text_field( $input[ $key ] );
@@ -1929,8 +1943,8 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
 					'more_info_target'         => '_blank',
 					'scroll_text'              => __( 'Al hacer scroll en esta página, usted acepta nuestra política de cookies', 'click-datos-lopd' ),
 					'opcion_cookie'            => get_option( 'botones' ),
-					'duracion_cookie_aceptar'  => __( 1, 'click-datos-lopd' ),
-					'duracion_cookie_rechazar' => __( 1, 'click-datos-lopd' ),
+					'duracion_cookie_aceptar'  => '1',
+					'duracion_cookie_rechazar' => '1',
 				);
 			}if ( ! empty( $previous_settings['catapult_cookie_bar_position_settings'] ) ) {
 				$defaults['position'] = 'bottom-bar';

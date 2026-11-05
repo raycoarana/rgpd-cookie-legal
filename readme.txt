@@ -4,7 +4,7 @@ Tags: LOPD, RGPD, politica de cookies, proteccion datos, clausulas legales
 Requires at least: 4.7
 Requires PHP: 7.0
 Tested up to: 6.7
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,10 @@ Un certificado SSL es esencial en nuestra página web puesto que su función es 
 7. Avisos de plugin back-end
 
 == Changelog ==
+= 1.0.1 =
+* Corregida la normalización de las selecciones de cláusulas para conservar los valores mayores/comerciales y filtrar entradas inválidas.
+* Evitada la duplicación de cláusulas ya presentes al buscar coincidencias desde el inicio del formulario.
+* Aplicadas correcciones de compatibilidad, comparación y estilo sin cambiar la versión mínima de WordPress.
 = 1.0.0 =
 * Primera versión del fork mantenido. Renumeración desde 3.1.1 del original.
 * Corregido XSS reflejado (CVE-2023-46071) y una inyección SQL en la búsqueda de formularios.
