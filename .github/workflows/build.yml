@@ -1,0 +1,36 @@
+name: Build plugin zip
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build distribution tree
+        shell: bash
+        run: |
+          mkdir -p build/rgpd-cookie-legal
+          if [[ -f .distignore ]]; then
+            rsync -a --exclude-from=.distignore --exclude='build/' --exclude='.git/' ./ build/rgpd-cookie-legal/
+          else
+            echo ".distignore is missing; copying repository files except build/ and .git/."
+            rsync -a --exclude='build/' --exclude='.git/' ./ build/rgpd-cookie-legal/
+          fi
+      - name: Create and inspect plugin zip
+        run: |
+          cd build
+          zip -qr ../rgpd-cookie-legal.zip rgpd-cookie-legal
+          cd ..
+          unzip -l rgpd-cookie-legal.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rgpd-cookie-legal
+          path: rgpd-cookie-legal.zip
+          if-no-files-found: error

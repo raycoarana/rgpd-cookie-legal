@@ -1,0 +1,28 @@
+name: Deploy to WordPress.org
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # Enable only after WordPress.org approves this plugin and creates its SVN repository:
+    # 1. After approval, check out the repository with: svn co https://plugins.svn.wordpress.org/rgpd-cookie-legal
+    # 2. Add WPORG_SVN_READY=true under Settings > Secrets and variables > Actions > Variables.
+    # 3. Add SVN_USERNAME and SVN_PASSWORD under Settings > Secrets and variables > Actions > Secrets.
+    # 4. Replace `if: false` with the variable-guard line below (uncomment it).
+    # WP.org SVN is a release repo: deploy only finished releases, never development snapshots.
+    # if: ${{ vars.WPORG_SVN_READY == 'true' }}
+    if: false # Inert until approval and deliberate activation.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: rgpd-cookie-legal
+          ASSETS_DIR: .wordpress-org

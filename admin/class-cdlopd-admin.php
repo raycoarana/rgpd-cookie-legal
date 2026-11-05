@@ -82,9 +82,9 @@ if (!class_exists('CDLOPD_Admin')) {
                         
                     } else {
                         if ($contadorclausulas == 0) {
-                            $forms .= "<strong>" . get_the_title() . "</strong>";
+                            $forms .= "<strong>" . esc_html(get_the_title()) . "</strong>";
                         } else {
-                            $forms .= "<strong>" . ', ' . get_the_title() . "</strong> ";
+                            $forms .= "<strong>" . ', ' . esc_html(get_the_title()) . "</strong> ";
                             $contadorplural++;
                         }
                         $contadorclausulas++;
@@ -121,7 +121,7 @@ if (!class_exists('CDLOPD_Admin')) {
                 <div class="error notice" id="formulariosin">
                     <p>
                         <?php
-                        echo $mensaje;
+                        echo wp_kses_post($mensaje);
                         ?>
                         <button type="button" onclick="cerrarBannerFormulario();">Cerrar</button>
                     </p>
@@ -165,7 +165,7 @@ if (!class_exists('CDLOPD_Admin')) {
                     <div class="error notice" id="cookiesinreg">
                         <p><?php
                             $res = $ncookies - intval(get_option("lopdwidget_cookie_contador", false));
-                            echo "Hay " . $res . " cookies sin registrar en tu pagina de Política de Cookies.";
+                            echo esc_html(sprintf('Hay %d cookies sin registrar en tu pagina de Política de Cookies.', $res));
                             ?>
                             <button type="button" onclick="cerrarBannerCookieSinReg();">Cerrar</button>
                         </p>
@@ -223,11 +223,11 @@ if (!class_exists('CDLOPD_Admin')) {
             wp_enqueue_style('cdlopd-admin-style', CDLOPD_PLUGIN_URL . 'assets/css/admin-style.css');
 
             // JS
-            wp_register_script('prefix_bootstrap', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js');
+            wp_register_script('prefix_bootstrap', CDLOPD_PLUGIN_URL . 'assets/js/bootstrap.min.js', array('jquery'), '3.3.7', true);
             wp_enqueue_script('prefix_bootstrap');
 
             // CSS
-            wp_register_style('prefix_bootstrap', CDLOPD_PLUGIN_URL . 'assets/css/bootstrap.css');
+            wp_register_style('prefix_bootstrap', CDLOPD_PLUGIN_URL . 'assets/css/bootstrap.css', array(), '3.3.7');
             wp_enqueue_style('prefix_bootstrap');
 
             // CSS toogle
@@ -235,7 +235,7 @@ if (!class_exists('CDLOPD_Admin')) {
             wp_enqueue_style('prefix_bootstrap_toogle');
 
             // JS toogle
-            wp_register_script('prefix_bootstrap_toogle', CDLOPD_PLUGIN_URL . 'assets/js/bootstrap-toggle.min.js');
+            wp_register_script('prefix_bootstrap_toogle', CDLOPD_PLUGIN_URL . 'assets/js/bootstrap-toggle.min.js', array('jquery', 'prefix_bootstrap'), '2.2.0', true);
             wp_enqueue_script('prefix_bootstrap_toogle');
         }
 
@@ -252,7 +252,7 @@ if (!class_exists('CDLOPD_Admin')) {
         // Creamos el menu del plugin en el admin
         public function add_admin_menu() {
 
-            add_menu_page(__('RGPD ClickDatos', 'click-datos-lopd'), __('RGPD ClickDatos', 'click-datos-lopd'), 'manage_options', 'cdlopd1', array($this, 'inicio'));
+            add_menu_page(__('RGPD Cookies y Páginas Legales', 'click-datos-lopd'), __('RGPD Cookies y Páginas Legales', 'click-datos-lopd'), 'manage_options', 'cdlopd1', array($this, 'inicio'));
 
             add_submenu_page('cdlopd1', 'Páginas', 'Páginas', 'manage_options', __FILE__ . '/custom3', 'paginaslodp');
 
@@ -264,41 +264,17 @@ if (!class_exists('CDLOPD_Admin')) {
 
             function CookiesParaRechazar() {
                 ?>
-                <script>
-                    jQuery(document).ready(function () {
-                        jQuery("#boton").click(function (event) {
-                            document.getElementById('resultados').removeAttribute('style');
-                            var nombreu = document.getElementById("nombreu").value;
-                            var nombrec = document.getElementById("nombrec").value;
-                            var email = document.getElementById("email").value;
-                            var url = document.getElementById("url").value;
-                            var mensaje = document.getElementById("mensaje").value;
-                            if (nombreu === "" || email === "" || url === "") {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Rellene todos los datos con * del formulario. <br>Por favor.");
-                            } else if (!jQuery('#checkprivacidad').is(':checked')) {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Debes aceptar la Política de Privacidad para poder enviar el formulario.");
-                            } else {
-                                jQuery.post('<?php echo esc_url(CDLOPD_PLUGIN_URL . 'admin/mail-contacto.php'); ?>', {nombreu: nombreu, nombrec: nombrec, email: email, url: url, mensaje: mensaje, nonce: '<?php echo esc_js(wp_create_nonce('cdlopd_mail_contacto')); ?>'}, function (respuesta) {
-                                    if (respuesta === 'Tu correo ha sido enviado correctamente.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: green;');
-                                    } else if (respuesta === 'Hubo un problema al enviar el email, intentalo de nuevo.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                    }
-                                    jQuery('#resultados').html(respuesta);
-                                });
-                            }
-                        });
-                    });
-                </script>
                 <?php
                 $cu = wp_get_current_user();
                 ?>
                 <div class='wrap'>
-                    <h1>RGPD ClickDatos - Precarga de Cookies</h1>
+                    <h1>RGPD Cookies y Páginas Legales - Precarga de Cookies</h1>
                     <!-- Button trigger modal -->
                     <button type="button" style="margin: auto;" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#myModal">¿Necesitas ayuda?</button>
+                    <p class="description" style="text-align:center; margin-top:1%;">
+                        ¿Tienes un problema? Abre una incidencia en
+                        <a href="https://github.com/raycoarana/rgpd-cookie-legal/issues" target="_blank" rel="noopener noreferrer">github.com/raycoarana/rgpd-cookie-legal/issues</a>.
+                    </p>
                     <!-- Modal -->
                     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg" style="width: 72% !important;">
@@ -314,9 +290,6 @@ if (!class_exists('CDLOPD_Admin')) {
                                         <!-- Nav tabs -->
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li role="presentation" class="active">
-                                                <a href="#ObtenSoporte" aria-controls="ObtenSoporte" role="tab" data-toggle="tab">Consulta tu web</a>
-                                            </li>
-                                            <li role="presentation">
                                                 <a href="#queeslargpd" aria-controls="queeslargpd" role="tab" data-toggle="tab">¿Qué es la RGPD?</a>
                                             </li>
                                             <li role="presentation">
@@ -334,45 +307,6 @@ if (!class_exists('CDLOPD_Admin')) {
                                         </ul>
                                         <!-- Tab panes -->
                                         <div class="tab-content"  style="text-align: center;">
-                                            <div role="tabpanel" class="tab-pane active" id="ObtenSoporte">
-                                                <div class="form-horizontal">
-                                                    <h1>ClickDatos le hará una valoración a su web</h1><h2>Comprobará si cumple con la RGPD y le responderemos cuanto antes, de forma gratuíta.</h2>
-                                                    <p>Si tiene alguna duda sobre la RGPD, puede consultar las demás pestañas donde hablamos de los requisitos para cumplir con esta Ley.</p>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Nombre:*</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="nombreu" id="nombreu" value="<?php $cu->user_login ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Nombre Completo:</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="nombrec" id="nombrec" value="<?php $cu->user_firstname . " " . $cu->user_lastname ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Email:*</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="email" id="email" value="<?php $cu->user_email ?>">
-                                                            <input type="hidden" id="url" value="<?php get_site_url() ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Mensaje:</label>
-                                                        <div class="col-sm-8">
-                                                            <textarea class="form-control" name="mensaje" id="mensaje" placeholder="Introduce un mensaje..."></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="col-sm-3"></div>
-                                                        <div class="col-sm-5">
-                                                            <input type="checkbox" name="privacidad" id="checkprivacidad"> He leído y acepto <a target="_blank" rel="nofollow noopener noreferrer" href="https://www.aepd.es/">Política de Privacidad</a> | AEPD.<br>
-                                                            <button id="boton" class="btn btn-primary btn-lg" style="margin-top: 4%; margin-bottom: 4%;">Enviar consulta</button><br>
-                                                            <label id="resultados"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div role="tabpanel" class="tab-pane" id="queeslargpd">
                                                 <h2 style="text-align: center;">¿Qué es el Reglamento General de Protección de Datos?</h2>
                                                 <p>El pasado 25 de mayo de 2016 entró en vigor el nuevo Reglamento General de Protección de Datos (RGPD) que deroga la Directiva 95/46/CE y viene a sustituir la normativa que actualmente estaba vigente en los países de la UE . Tiene lugar con motivo de la&nbsp;<a title="El enlace se abrirá en una nueva ventana" href="http://www.europarl.europa.eu/news/es/news-room/20160407IPR21776/reforma-de-la-protecci%C3%B3n-de-datos-%E2%80%93-nuevas-reglas-adaptadas-a-la-era-digital" target="_blank" rel="nofollow noopener noreferrer">reforma normativa realizada por la Unión Europea</a>&nbsp; cuyo objetivo es adaptar la legislación vigente a las exigencias en los niveles de seguridad que demanda la realidad digital actual.</p>
@@ -484,7 +418,7 @@ if (!class_exists('CDLOPD_Admin')) {
                     </div>
                 </div>
                 <?php
-                if (isset($_POST['scripts']) && $_POST['scripts'] == 'Guardar Scripts') {
+                if (isset($_POST['scripts']) && 'Guardar Scripts' === sanitize_text_field(wp_unslash($_POST['scripts']))) {
                     if (!current_user_can('manage_options')) {
                         wp_die(esc_html__('No autorizado.', 'click-datos-lopd'));
                     }
@@ -492,7 +426,9 @@ if (!class_exists('CDLOPD_Admin')) {
 
                     // Estos campos almacenan <script> (funcionalidad del plugin), pero solo
                     // pueden guardarse desde el panel de administración y con capacidad + nonce.
+                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Stored raw by design; these trusted-admin fields hold executable script blocks.
                     $sheader = isset($_POST['sheader']) ? wp_unslash($_POST['sheader']) : '';
+                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Stored raw by design; these trusted-admin fields hold executable script blocks.
                     $sfooter = isset($_POST['sfooter']) ? wp_unslash($_POST['sfooter']) : '';
 
                     $sheaderid = 11122;
@@ -531,75 +467,8 @@ if (!class_exists('CDLOPD_Admin')) {
                     wp_die(esc_html__('No autorizado.', 'click-datos-lopd'));
                 }
                 ?>
-                <script>
-                    jQuery(document).ready(function () {
-                        jQuery("#boton").click(function (event) {
-                            document.getElementById('resultados').removeAttribute('style');
-                            var nombreu = document.getElementById("nombreu").value;
-                            var nombrec = document.getElementById("nombrec").value;
-                            var email = document.getElementById("email").value;
-                            var url = document.getElementById("url").value;
-                            var mensaje = document.getElementById("mensaje").value;
-                            if (nombreu === "" || email === "" || url === "") {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Rellene todos los datos con * del formulario. <br>Por favor.");
-                            } else if (!jQuery('#checkprivacidad').is(':checked')) {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Debes aceptar la Política de Privacidad para poder enviar el formulario.");
-                            } else {
-                                jQuery.post('<?php echo esc_url(CDLOPD_PLUGIN_URL . 'admin/mail-contacto.php'); ?>', {nombreu: nombreu, nombrec: nombrec, email: email, url: url, mensaje: mensaje, nonce: '<?php echo esc_js(wp_create_nonce('cdlopd_mail_contacto')); ?>'}, function (respuesta) {
-                                    if (respuesta === 'Tu correo ha sido enviado correctamente.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: green;');
-                                    } else if (respuesta === 'Hubo un problema al enviar el email, intentalo de nuevo.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                    }
-                                    jQuery('#resultados').html(respuesta);
-                                });
-                            }
-                        });
-                    });
-
-                    jQuery(function () {
-                        jQuery('#toggle-two').bootstrapToggle({
-                            on: 'Enabled',
-                            off: 'Disabled'
-                        });
-                    });
-                    function cambiaicono(idform) {
-                        document.getElementById("icono" + idform).removeAttribute("src");
-                        document.getElementById("icono" + idform).setAttribute("src", "<?php echo CDLOPD_PLUGIN_URL . 'assets/images/trashtransparenteblanca.png'; ?>");
-                    }
-                    function cambiaiconoo(idform) {
-                        document.getElementById("icono" + idform).removeAttribute("src");
-                        document.getElementById("icono" + idform).setAttribute("src", "<?php echo CDLOPD_PLUGIN_URL . 'assets/images/trashtransparentenaranja.png'; ?>");
-                    }
-
-                    function cambio(idform) {
-                        if (!document.getElementById("main" + idform).checked) {
-                            document.getElementById("mayores" + idform).parentElement.removeAttribute("enabled");
-                            document.getElementById("comerciales" + idform).parentElement.removeAttribute("enabled");
-                            document.getElementById("mayores" + idform).removeAttribute("enabled");
-                            document.getElementById("comerciales" + idform).removeAttribute("enabled");
-
-                            document.getElementById("mayores" + idform).parentElement.setAttribute("disabled", "disabled");
-                            document.getElementById("comerciales" + idform).parentElement.setAttribute("disabled", "disabled");
-                            document.getElementById("mayores" + idform).setAttribute("disabled", "disabled");
-                            document.getElementById("comerciales" + idform).setAttribute("disabled", "disabled");
-                        } else {
-                            document.getElementById("mayores" + idform).parentElement.removeAttribute("disabled");
-                            document.getElementById("comerciales" + idform).parentElement.removeAttribute("disabled");
-                            document.getElementById("mayores" + idform).removeAttribute("disabled");
-                            document.getElementById("comerciales" + idform).removeAttribute("disabled");
-
-                            document.getElementById("mayores" + idform).parentElement.setAttribute("enabled", "enabled");
-                            document.getElementById("comerciales" + idform).parentElement.setAttribute("enabled", "enabled");
-                            document.getElementById("mayores" + idform).setAttribute("enabled", "enabled");
-                            document.getElementById("comerciales" + idform).setAttribute("enabled", "enabled");
-                        }
-                    }
-                </script>
                 <?php
-                if (isset($_POST['buscar']) && $_POST['buscar'] == "Buscar") {
+                if (isset($_POST['buscar']) && 'Buscar' === sanitize_text_field(wp_unslash($_POST['buscar']))) {
                     $busqueda = isset($_POST['busqueda']) ? sanitize_text_field(wp_unslash($_POST['busqueda'])) : '';
                 }
 
@@ -661,9 +530,9 @@ if (!class_exists('CDLOPD_Admin')) {
                 //AQUI EMPIEZA EL SELECTOR DE ELIMINACION DE CLAUSULAS RGPD EN CONTACT FORM// 
 
 
-                if (isset($_POST['action2']) && $_POST['action2']) {
+                $formulario = isset($_POST['action2']) ? absint(wp_unslash($_POST['action2'])) : 0;
+                if (isset($_POST['action2']) && $formulario) {
                     check_admin_referer('cdlopd_eliminar_clausulas');
-                    $formulario = absint(wp_unslash($_POST['action2']));
                     $query = new WP_Query(array('post_type' => 'wpcf7_contact_form', 'p' => $formulario));
 
                     if ($query->have_posts()) :
@@ -699,9 +568,13 @@ if (!class_exists('CDLOPD_Admin')) {
                 $cu = wp_get_current_user();
                 ?>    
                 <div class='wrap'>
-                    <h1>RGPD ClickDatos - Formularios de Contact Form</h1>
+                    <h1>RGPD Cookies y Páginas Legales - Formularios de Contact Form</h1>
                     <!-- Button trigger modal -->
                     <button type="button" style="margin: auto;" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#myModal">¿Necesitas ayuda?</button>
+                    <p class="description" style="text-align:center; margin-top:1%;">
+                        ¿Tienes un problema? Abre una incidencia en
+                        <a href="https://github.com/raycoarana/rgpd-cookie-legal/issues" target="_blank" rel="noopener noreferrer">github.com/raycoarana/rgpd-cookie-legal/issues</a>.
+                    </p>
                     <!-- Modal -->
                     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg" style="width: 72% !important;">
@@ -717,9 +590,6 @@ if (!class_exists('CDLOPD_Admin')) {
                                         <!-- Nav tabs -->
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li role="presentation" class="active">
-                                                <a href="#ObtenSoporte" aria-controls="ObtenSoporte" role="tab" data-toggle="tab">Consulta tu web</a>
-                                            </li>
-                                            <li role="presentation">
                                                 <a href="#queeslargpd" aria-controls="queeslargpd" role="tab" data-toggle="tab">¿Qué es la RGPD?</a>
                                             </li>
                                             <li role="presentation">
@@ -737,45 +607,6 @@ if (!class_exists('CDLOPD_Admin')) {
                                         </ul>
                                         <!-- Tab panes -->
                                         <div class="tab-content"  style="text-align: center;">
-                                            <div role="tabpanel" class="tab-pane active" id="ObtenSoporte">
-                                                <div class="form-horizontal">
-                                                    <h1>ClickDatos le hará una valoración a su web</h1><h2>Comprobará si cumple con la RGPD y le responderemos cuanto antes, de forma gratuíta.</h2>
-                                                    <p>Si tiene alguna duda sobre la RGPD, puede consultar las demás pestañas donde hablamos de los requisitos para cumplir con esta Ley.</p>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Nombre:*</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="nombreu" id="nombreu" value="<?php $cu->user_login ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Nombre Completo:</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="nombrec" id="nombrec" value="<?php $cu->user_firstname . " " . $cu->user_lastname ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Email:*</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="email" id="email" value="<?php $cu->user_email ?>">
-                                                            <input type="hidden" id="url" value="<?php get_site_url() ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Mensaje:</label>
-                                                        <div class="col-sm-8">
-                                                            <textarea class="form-control" name="mensaje" id="mensaje" placeholder="Introduce un mensaje..."></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="col-sm-3"></div>
-                                                        <div class="col-sm-5">
-                                                            <input type="checkbox" name="privacidad" id="checkprivacidad"> He leído y acepto <a target="_blank" rel="nofollow noopener noreferrer" href="https://www.aepd.es/">Política de Privacidad</a> | AEPD.<br>
-                                                            <button id="boton" class="btn btn-primary btn-lg" style="margin-top: 4%; margin-bottom: 4%;">Enviar consulta</button><br>
-                                                            <label id="resultados"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div role="tabpanel" class="tab-pane" id="queeslargpd">
                                                 <h2 style="text-align: center;">¿Qué es el Reglamento General de Protección de Datos?</h2>
                                                 <p>El pasado 25 de mayo de 2016 entró en vigor el nuevo Reglamento General de Protección de Datos (RGPD) que deroga la Directiva 95/46/CE y viene a sustituir la normativa que actualmente estaba vigente en los países de la UE . Tiene lugar con motivo de la&nbsp;<a title="El enlace se abrirá en una nueva ventana" href="http://www.europarl.europa.eu/news/es/news-room/20160407IPR21776/reforma-de-la-protecci%C3%B3n-de-datos-%E2%80%93-nuevas-reglas-adaptadas-a-la-era-digital" target="_blank" rel="nofollow noopener noreferrer">reforma normativa realizada por la Unión Europea</a>&nbsp; cuyo objetivo es adaptar la legislación vigente a las exigencias en los niveles de seguridad que demanda la realidad digital actual.</p>
@@ -903,7 +734,7 @@ if (!class_exists('CDLOPD_Admin')) {
                                             <div class="cdlopd-formularios"> 
                                                 <p style="font-size: 24px; margin-left: 3%;"> <?php the_title(); ?> 
                                                     <?php if (strpos($cadena, $clausula1) !== false || strpos($cadena, $clausula2) !== false || strpos($cadena, $clausula3) !== false) { ?>
-                                                        <button onmouseout="cambiaiconoo(<?php the_ID(); ?>)" onmouseover="cambiaicono(<?php the_ID(); ?>)" type="submit" name="action2" class="btn btn-outline-danger" value="<?php the_ID(); ?>" style="float: right; margin-right: 5%; height: 36px;"><img id="icono<?php the_ID(); ?>" rel="icon" height="23px" width="25px" src="<?php echo CDLOPD_PLUGIN_URL . 'assets/images/trashtransparentenaranja.png'; ?>"></button>
+                                                        <button onmouseout="cambiaiconoo(<?php the_ID(); ?>)" onmouseover="cambiaicono(<?php the_ID(); ?>)" type="submit" name="action2" class="btn btn-outline-danger" value="<?php the_ID(); ?>" style="float: right; margin-right: 5%; height: 36px;"><img id="icono<?php the_ID(); ?>" rel="icon" height="23px" width="25px" src="<?php echo esc_url(CDLOPD_PLUGIN_URL . 'assets/images/trashtransparentenaranja.png'); ?>"></button>
                                                     <?php } ?>
                                                 </p>
                                                 <p <?php
@@ -1120,16 +951,17 @@ if (!class_exists('CDLOPD_Admin')) {
                             $reg_errors->add("invalid-telefono", "<div class='error message' style='padding: 10px'>El telefono debe tener 9 digitos</div>");
                         }
 
-                        $cpostal = isset($_POST['cp']) ? ctype_digit(wp_unslash($_POST['cp'] ?? '')) : false;
+                        $cp = isset($_POST['cp']) ? sanitize_text_field(wp_unslash($_POST['cp'])) : '';
+                        $cpostal = ctype_digit($cp);
 
-                        if (!isset($_POST['cp']) || strlen(wp_unslash($_POST['cp'] ?? '')) != 5 || $cpostal == FALSE) {
+                        if (strlen($cp) != 5 || $cpostal == FALSE) {
                             $reg_errors->add("invalid-postalcode", "<div class='error message' style='padding: 10px'>El código postal debe tener 5 digitos</div>");
                         }
                        
                         if (count($reg_errors->get_error_messages()) > 0) {
                             foreach ($reg_errors->get_error_messages() as $error) {
                                 ?>
-                                <p><?php echo $error; ?></p>
+                                <p><?php echo esc_html($error); ?></p>
                                 <?php
                             }
                         } else {
@@ -1388,41 +1220,17 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                     }
                     //AQUI EMPEZAR�? LA PARTE DE RECOGER LOS DATOS DE LAS COOKIES INTRODUCIDOS ANTERIORMENTE
                     ?>
-                    <script>
-                        jQuery(document).ready(function () {
-                            jQuery("#boton").click(function (event) {
-                                document.getElementById('resultados').removeAttribute('style');
-                                var nombreu = document.getElementById("nombreu").value;
-                                var nombrec = document.getElementById("nombrec").value;
-                                var email = document.getElementById("email").value;
-                                var url = document.getElementById("url").value;
-                                var mensaje = document.getElementById("mensaje").value;
-                                if (nombreu === "" || email === "" || url === "") {
-                                    document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                    jQuery('#resultados').html("Rellene todos los datos con * del formulario. <br>Por favor.");
-                                } else if (!jQuery('#checkprivacidad').is(':checked')) {
-                                    document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                    jQuery('#resultados').html("Debes aceptar la Política de Privacidad para poder enviar el formulario.");
-                                } else {
-                                    jQuery.post('<?php echo esc_url(CDLOPD_PLUGIN_URL . 'admin/mail-contacto.php'); ?>', {nombreu: nombreu, nombrec: nombrec, email: email, url: url, mensaje: mensaje, nonce: '<?php echo esc_js(wp_create_nonce('cdlopd_mail_contacto')); ?>'}, function (respuesta) {
-                                        if (respuesta === 'Tu correo ha sido enviado correctamente.') {
-                                            document.getElementById('resultados').setAttribute('style', 'color: green;');
-                                        } else if (respuesta === 'Hubo un problema al enviar el email, intentalo de nuevo.') {
-                                            document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                        }
-                                        jQuery('#resultados').html(respuesta);
-                                    });
-                                }
-                            });
-                        });
-                    </script>
                     <div class='wrap'>
-                        <h1>RGPD ClickDatos - Creación de páginas </h1>
+                        <h1>RGPD Cookies y Páginas Legales - Creación de páginas </h1>
                         <?php
                         $cu = wp_get_current_user();
                         ?>
                         <!-- Button trigger modal -->
                         <button type="button" style="margin: auto;" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#myModal">¿Necesitas ayuda?</button>
+                    <p class="description" style="text-align:center; margin-top:1%;">
+                        ¿Tienes un problema? Abre una incidencia en
+                        <a href="https://github.com/raycoarana/rgpd-cookie-legal/issues" target="_blank" rel="noopener noreferrer">github.com/raycoarana/rgpd-cookie-legal/issues</a>.
+                    </p>
                         <!-- Modal -->
                         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg" style="width: 72% !important;">
@@ -1438,9 +1246,6 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                             <!-- Nav tabs -->
                                             <ul class="nav nav-tabs" role="tablist">
                                                 <li role="presentation" class="active">
-                                                    <a href="#ObtenSoporte" aria-controls="ObtenSoporte" role="tab" data-toggle="tab">Consulta tu web</a>
-                                                </li>
-                                                <li role="presentation">
                                                     <a href="#queeslargpd" aria-controls="queeslargpd" role="tab" data-toggle="tab">¿Qué es la RGPD?</a>
                                                 </li>
                                                 <li role="presentation">
@@ -1458,45 +1263,6 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                             </ul>
                                             <!-- Tab panes -->
                                             <div class="tab-content"  style="text-align: center;">
-                                                <div role="tabpanel" class="tab-pane active" id="ObtenSoporte">
-                                                    <div class="form-horizontal">
-                                                        <h1>ClickDatos le hará una valoración a su web</h1><h2>Comprobará si cumple con la RGPD y le responderemos cuanto antes, de forma gratuíta.</h2>
-                                                        <p>Si tiene alguna duda sobre la RGPD, puede consultar las demás pestañas donde hablamos de los requisitos para cumplir con esta Ley.</p>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-sm-2">Nombre:*</label>
-                                                            <div class="col-sm-8">
-                                                                <input type="text" class="form-control" name="nombreu" id="nombreu" value="<?php echo esc_attr($cu->user_login); ?>">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-sm-2">Nombre Completo:</label>
-                                                            <div class="col-sm-8">
-                                                                <input type="text" class="form-control" name="nombrec" id="nombrec" value="<?php echo esc_attr($cu->user_firstname . ' ' . $cu->user_lastname); ?>">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-sm-2">Email:*</label>
-                                                            <div class="col-sm-8">
-                                                                <input type="text" class="form-control" name="email" id="email" value="<?php echo esc_attr($cu->user_email); ?>">
-                                                                <input type="hidden" id="url" value="<?php echo get_site_url(); ?>">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-sm-2">Mensaje:</label>
-                                                            <div class="col-sm-8">
-                                                                <textarea class="form-control" name="mensaje" id="mensaje" placeholder="Introduce un mensaje..."></textarea>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-sm-3"></div>
-                                                            <div class="col-sm-5">
-                                                                <input type="checkbox" name="privacidad" id="checkprivacidad"> He leído y acepto <a target="_blank" rel="nofollow noopener noreferrer" href="https://www.aepd.es/">Política de Privacidad</a> | AEPD.<br>
-                                                                <button id="boton" class="btn btn-primary btn-lg" style="margin-top: 4%; margin-bottom: 4%;">Enviar consulta</button><br>
-                                                                <label id="resultados"></label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div role="tabpanel" class="tab-pane" id="queeslargpd">
                                                     <h2 style="text-align: center;">¿Qué es el Reglamento General de Protección de Datos?</h2>
                                                     <p>El pasado 25 de mayo de 2016 entró en vigor el nuevo Reglamento General de Protección de Datos (RGPD) que deroga la Directiva 95/46/CE y viene a sustituir la normativa que actualmente estaba vigente en los países de la UE . Tiene lugar con motivo de la&nbsp;<a title="El enlace se abrirá en una nueva ventana" href="http://www.europarl.europa.eu/news/es/news-room/20160407IPR21776/reforma-de-la-protecci%C3%B3n-de-datos-%E2%80%93-nuevas-reglas-adaptadas-a-la-era-digital" target="_blank" rel="nofollow noopener noreferrer">reforma normativa realizada por la Unión Europea</a>&nbsp; cuyo objetivo es adaptar la legislación vigente a las exigencias en los niveles de seguridad que demanda la realidad digital actual.</p>
@@ -1726,10 +1492,10 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                                                                 <?php
                                                                             }
                                                                             ?></label>
-                                                                        <input id="nombrecookie<?php echo $i; ?>" name="nombrecookie<?php echo $i; ?>" type="hidden" value="<?php echo esc_html($cookie['nombre']); ?>">
+                                                                        <input id="nombrecookie<?php echo esc_attr($i); ?>" name="nombrecookie<?php echo esc_attr($i); ?>" type="hidden" value="<?php echo esc_html($cookie['nombre']); ?>">
                                                                     </td>
                                                                     <td style="border: 1px solid #ff6f00!important;">
-                                                                        <select style="width: 100%!important;" id="categoria<?php echo $i; ?>" name="categoria<?php echo $i; ?>">
+                                                                        <select style="width: 100%!important;" id="categoria<?php echo esc_attr($i); ?>" name="categoria<?php echo esc_attr($i); ?>">
                                                                             <option value="Funcionalidad" <?php
                                                                             if ($cookie['categoria'] == 'Funcionalidad') {
                                                                                 echo 'selected="selected"';
@@ -1748,10 +1514,10 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                                                         </select>
                                                                     </td>
                                                                     <td style="border: 1px solid #ff6f00!important; ">
-                                                                        <textarea style="width: 100%!important;" rows="3" cols="40" id="descripcion<?php echo $i; ?>" name="descripcion<?php echo $i; ?>" placeholder="Descripción"><?php echo esc_textarea($cookie['descripcion']); ?></textarea>
+                                                                        <textarea style="width: 100%!important;" rows="3" cols="40" id="descripcion<?php echo esc_attr($i); ?>" name="descripcion<?php echo esc_attr($i); ?>" placeholder="Descripción"><?php echo esc_textarea($cookie['descripcion']); ?></textarea>
                                                                     </td>
                                                                     <td style="border: 1px solid #ff6f00!important;">
-                                                                        <select style="width: 100%!important;" id="propiedad<?php echo $i; ?>" name="propiedad<?php echo $i; ?>">
+                                                                        <select style="width: 100%!important;" id="propiedad<?php echo esc_attr($i); ?>" name="propiedad<?php echo esc_attr($i); ?>">
                                                                             <option value="Terceros" <?php
                                                                             if ($cookie['propiedad'] == 'Terceros') {
                                                                                 echo 'selected="selected"';
@@ -1765,7 +1531,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                                                         </select>
                                                                     </td>
                                                                     <td style="border: 1px solid #ff6f00!important;">
-                                                                        <input style="width: 100%!important;" type="text" id="duracion<?php echo $i; ?>" name="duracion<?php echo $i; ?>" placeholder="Duración" value="<?php echo esc_attr($cookie['duracion']); ?>">
+                                                                        <input style="width: 100%!important;" type="text" id="duracion<?php echo esc_attr($i); ?>" name="duracion<?php echo esc_attr($i); ?>" placeholder="Duración" value="<?php echo esc_attr($cookie['duracion']); ?>">
                                                                     </td>
                                                                 </tr>
                                                             <?php }
@@ -2024,7 +1790,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                 <div class='cdlopd-formularios'>
                     <input type="text" name="cdlopd_content_settings[heading_text]" value="<?php echo esc_attr($cdlopd_content_settings['heading_text']); ?>">
-                    <p class="description"><?php _e('Texto de cabecera del bannner(no se mostrara si se posiciona en la parte superior o inferior)', 'click-datos-lopd'); ?></p>
+                    <p class="description"><?php esc_html_e('Texto de cabecera del bannner(no se mostrara si se posiciona en la parte superior o inferior)', 'click-datos-lopd'); ?></p>
                 </div>
                 <?php
             }
@@ -2036,7 +1802,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input class="widefat" type="text" name="cdlopd_content_settings[notification_text]" value="<?php echo esc_attr($cdlopd_content_settings['notification_text']); ?>">
-                    <p class="description"><?php _e('Texto principal del banner de política de cookies', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Texto principal del banner de política de cookies', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2047,7 +1813,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" name="cdlopd_content_settings[accept_text]" value="<?php echo esc_attr($cdlopd_content_settings['accept_text']); ?>">
-                    <p class="description"><?php _e('Texto de botón para aceptar política de cookies y cerrar banner', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Texto de botón para aceptar política de cookies y cerrar banner', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2058,7 +1824,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" name="cdlopd_content_settings[more_info_text]" value="<?php echo esc_attr($cdlopd_content_settings['more_info_text']); ?>">
-                    <p class="description"><?php _e('Texto para enlace a página de más información', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Texto para enlace a página de más información', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2074,10 +1840,10 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                         <select name='cdlopd_content_settings[more_info_page]'>
                             <option></option>
                             <?php foreach ($pages as $page) { ?>
-                                <option value='<?php echo $page->ID; ?>' <?php selected($cdlopd_content_settings['more_info_page'], $page->ID); ?>><?php echo esc_html($page->post_title); ?></option>
+                                <option value='<?php echo esc_attr($page->ID); ?>' <?php selected($cdlopd_content_settings['more_info_page'], $page->ID); ?>><?php echo esc_html($page->post_title); ?></option>
                             <?php } ?>
                         </select>
-                        <p class="description"><?php _e('Seleccionar la página que muestre la información', 'click-datos-lopd'); ?></p></div>
+                        <p class="description"><?php esc_html_e('Seleccionar la página que muestre la información', 'click-datos-lopd'); ?></p></div>
                     <?php
                 }
             }
@@ -2089,7 +1855,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="url" name="cdlopd_content_settings[more_info_url]" value="<?php echo esc_url($cdlopd_content_settings['more_info_url']); ?>">
-                    <p class="description"><?php _e('Si no dispone de página de política de cookies puede escribir una url externa.', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Si no dispone de página de política de cookies puede escribir una url externa.', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2100,10 +1866,10 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <select name='cdlopd_content_settings[more_info_target]'>
-                        <option value='_blank' <?php selected($cdlopd_content_settings['more_info_target'], '_blank'); ?>><?php _e('Nueva Página', 'click-datos-lopd'); ?></option>
-                        <option value='_self' <?php selected($cdlopd_content_settings['more_info_target'], '_self'); ?>><?php _e('Misma Página', 'click-datos-lopd'); ?></option>
+                        <option value='_blank' <?php selected($cdlopd_content_settings['more_info_target'], '_blank'); ?>><?php esc_html_e('Nueva Página', 'click-datos-lopd'); ?></option>
+                        <option value='_self' <?php selected($cdlopd_content_settings['more_info_target'], '_self'); ?>><?php esc_html_e('Misma Página', 'click-datos-lopd'); ?></option>
                     </select>
-                    <p class="description"><?php _e('Abrir url externa en nueva página o en la misma página', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Abrir url externa en nueva página o en la misma página', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2118,16 +1884,16 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <select name='cdlopd_content_settings[position]'>
-                        <option value='top-bar' <?php selected($options['position'], 'top-bar'); ?>><?php _e('Superior', 'click-datos-lopd'); ?></option>
-                        <option value='bottom-bar' <?php selected($options['position'], 'bottom-bar'); ?>><?php _e('Inferior', 'click-datos-lopd'); ?></option>
-                        <option value='top-left-block' <?php selected($options['position'], 'top-left-block'); ?>><?php _e('Superior Izquierda', 'click-datos-lopd'); ?></option>
-                        <option value='top-right-block' <?php selected($options['position'], 'top-right-block'); ?>><?php _e('Superior Derecha', 'click-datos-lopd'); ?></option>
-                        <option value='bottom-left-block' <?php selected($options['position'], 'bottom-left-block'); ?>><?php _e('Inferior Izquierda', 'click-datos-lopd'); ?></option>
-                        <option value='bottom-right-block' <?php selected($options['position'], 'bottom-right-block'); ?>><?php _e('Inferior Derecha', 'click-datos-lopd'); ?></option>
-                        <option value='bottom-center-block' <?php selected($options['position'], 'bottom-center-block'); ?>><?php _e('Intrusivo', 'click-datos-lopd'); ?></option>
+                        <option value='top-bar' <?php selected($options['position'], 'top-bar'); ?>><?php esc_html_e('Superior', 'click-datos-lopd'); ?></option>
+                        <option value='bottom-bar' <?php selected($options['position'], 'bottom-bar'); ?>><?php esc_html_e('Inferior', 'click-datos-lopd'); ?></option>
+                        <option value='top-left-block' <?php selected($options['position'], 'top-left-block'); ?>><?php esc_html_e('Superior Izquierda', 'click-datos-lopd'); ?></option>
+                        <option value='top-right-block' <?php selected($options['position'], 'top-right-block'); ?>><?php esc_html_e('Superior Derecha', 'click-datos-lopd'); ?></option>
+                        <option value='bottom-left-block' <?php selected($options['position'], 'bottom-left-block'); ?>><?php esc_html_e('Inferior Izquierda', 'click-datos-lopd'); ?></option>
+                        <option value='bottom-right-block' <?php selected($options['position'], 'bottom-right-block'); ?>><?php esc_html_e('Inferior Derecha', 'click-datos-lopd'); ?></option>
+                        <option value='bottom-center-block' <?php selected($options['position'], 'bottom-center-block'); ?>><?php esc_html_e('Intrusivo', 'click-datos-lopd'); ?></option>
                     
                     </select>
-                    <p class="description"><?php _e('Posición en la que aparece el banner de Política de cookies', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Posición en la que aparece el banner de Política de cookies', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2138,7 +1904,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[text_color]" value="<?php echo esc_attr($options['text_color']); ?>">
-                    <p class="description"><?php _e('Color del texto principal de banner de política de cookies', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color del texto principal de banner de política de cookies', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2149,7 +1915,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[bg_color]" value="<?php echo esc_attr($options['bg_color']); ?>">
-                    <p class="description"><?php _e('Color de fondo del banner', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color de fondo del banner', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2160,7 +1926,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[link_color]" value="<?php echo esc_attr($options['link_color']); ?>">
-                    <p class="description"><?php _e('Color de texto que enlaza a más información', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color de texto que enlaza a más información', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
             
@@ -2172,7 +1938,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                     <div class="cdlopd-formularios">
                         <input type="text" name="cdlopd_content_settings[grosor_border]" value="<?php echo esc_attr($options['grosor_border']); ?>">
-                        <p class="description"><?php _e('Establece el grosor en píxeles que tendrá el banner de política de cookies', 'click-datos-lopd'); ?></p>
+                        <p class="description"><?php esc_html_e('Establece el grosor en píxeles que tendrá el banner de política de cookies', 'click-datos-lopd'); ?></p>
                     </div>
                 <?php
             }
@@ -2185,7 +1951,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                     <div class="cdlopd-formularios">
                         <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[color_border]" value="<?php echo esc_attr($options['color_border']); ?>">
-                        <p class="description"><?php _e('Color del borde del banner de política de cookies', 'click-datos-lopd'); ?></p>
+                        <p class="description"><?php esc_html_e('Color del borde del banner de política de cookies', 'click-datos-lopd'); ?></p>
                     </div>
                 <?php
             }
@@ -2197,7 +1963,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[button_color_aceptar]" value="<?php echo esc_attr($options['button_color_aceptar']); ?>">
-                    <p class="description"><?php _e('Color de texto del botón de aceptar política', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color de texto del botón de aceptar política', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2208,7 +1974,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[button_bg_color_aceptar]" value="<?php echo esc_attr($options['button_bg_color_aceptar']); ?>">
-                    <p class="description"><?php _e('Color de fondo del boton de aceptar política', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color de fondo del boton de aceptar política', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
             //Funciones para cargar la eleccion de color del boton Aceptar
@@ -2219,7 +1985,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[button_color_rechazar]" value="<?php echo esc_attr($options['button_color_rechazar']); ?>">
-                    <p class="description"><?php _e('Color de texto del botón de rechazar política', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color de texto del botón de rechazar política', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
             
@@ -2230,7 +1996,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?><div class='cdlopd-formularios'>
                     <input type="text" class="cdlopd-color-field" name="cdlopd_content_settings[button_bg_color_rechazar]" value="<?php echo esc_attr($options['button_bg_color_rechazar']); ?>">
-                    <p class="description"><?php _e('Color de fondo del boton de rechazar política', 'click-datos-lopd'); ?></p></div>
+                    <p class="description"><?php esc_html_e('Color de fondo del boton de rechazar política', 'click-datos-lopd'); ?></p></div>
                 <?php
             }
 
@@ -2242,7 +2008,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                 <div class='cdlopd-formularios'>
                     <input type="text" name="cdlopd_content_settings[deny_text]" value="<?php echo esc_attr($cdlopd_content_settings['deny_text']); ?>">
-                    <p class="description"><?php _e('Texto de botón para rechazar la política de cookies y cerrar banner', 'click-datos-lopd'); ?></p>
+                    <p class="description"><?php esc_html_e('Texto de botón para rechazar la política de cookies y cerrar banner', 'click-datos-lopd'); ?></p>
                 </div>
                 <?php
             }
@@ -2254,10 +2020,10 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 }
                 ?>
                     <div class="cdlopd-formularios">
-                        <input type='radio' checked="checked" name='cdlopd_content_settings[opcion_cookie]' value='botones' <?php if (esc_attr($cdlopd_content_settings['opcion_cookie']) === 'botones'){ ?> checked="checked" <?php } ?>><?php _e('Botones', 'click-datos-lopd'); ?>
+                        <input type='radio' checked="checked" name='cdlopd_content_settings[opcion_cookie]' value='botones' <?php if (esc_attr($cdlopd_content_settings['opcion_cookie']) === 'botones'){ ?> checked="checked" <?php } ?>><?php esc_html_e('Botones', 'click-datos-lopd'); ?>
                         &nbsp;
-                        <input type='radio' name='cdlopd_content_settings[opcion_cookie]' value='scroll' <?php if (esc_attr($cdlopd_content_settings['opcion_cookie']) === 'scroll'){ ?> checked="checked" <?php } ?>><?php _e('Scroll Página', 'click-datos-lopd'); ?>
-                        <p class="description"><?php _e('Elige el método por el que se cargarán las cookies<br>-Botones: El usuario aceptará o rechazará las cookies por medio de botones<br>-Scroll Página: El usuario aceptará las cookies al hacer scroll en la página', 'click-datos-lopd'); ?></p>
+                        <input type='radio' name='cdlopd_content_settings[opcion_cookie]' value='scroll' <?php if (esc_attr($cdlopd_content_settings['opcion_cookie']) === 'scroll'){ ?> checked="checked" <?php } ?>><?php esc_html_e('Scroll Página', 'click-datos-lopd'); ?>
+                        <p class="description"><?php esc_html_e('Elige el método por el que se cargarán las cookies<br>-Botones: El usuario aceptará o rechazará las cookies por medio de botones<br>-Scroll Página: El usuario aceptará las cookies al hacer scroll en la página', 'click-datos-lopd'); ?></p>
                     </div>
                 <?php
             }
@@ -2270,7 +2036,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                     <div class="cdlopd-formularios">
                         <input class="widefat" type="text" name='cdlopd_content_settings[scroll_text]' value="<?php echo esc_attr($cdlopd_content_settings['scroll_text']); ?>">
-                        <p class="description"><?php _e('Texto para el scroll del banner de política de cookies', 'click-datos-lopd'); ?></p>
+                        <p class="description"><?php esc_html_e('Texto para el scroll del banner de política de cookies', 'click-datos-lopd'); ?></p>
                     </div>
                 <?php
             }
@@ -2283,7 +2049,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                 <div class='cdlopd-formularios'>
                     <input type="text" name="cdlopd_content_settings[duracion_cookie_aceptar]" value="<?php echo esc_attr($cdlopd_content_settings['duracion_cookie_aceptar']); ?>">
-                    <p class="description"><?php _e('Establece el número de días que estará activa la cookie aceptar', 'click-datos-lopd'); ?></p>
+                    <p class="description"><?php esc_html_e('Establece el número de días que estará activa la cookie aceptar', 'click-datos-lopd'); ?></p>
                 </div>
                 <?php
             }
@@ -2296,7 +2062,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                 <div class='cdlopd-formularios'>
                     <input type="text" name="cdlopd_content_settings[duracion_cookie_rechazar]" value="<?php echo esc_attr($cdlopd_content_settings['duracion_cookie_rechazar']); ?>">
-                    <p class="description"><?php _e('Establece el número de días que estará activa la cookie rechazar', 'click-datos-lopd'); ?></p>
+                    <p class="description"><?php esc_html_e('Establece el número de días que estará activa la cookie rechazar', 'click-datos-lopd'); ?></p>
                 </div>
                 <?php
             }
@@ -2309,7 +2075,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 ?>
                     <div class="cdlopd-formularios">
                         <input type="text" id="porcent_scroll" name="cdlopd_content_settings[porcentaje_scroll]" value="25" readonly="readonly">
-                        <p class="description"><?php _e('Establece el porcentaje por el cuál la página cargará la cookie de aceptar la política de cookies', 'click-datos-lopd'); ?></p>
+                        <p class="description"><?php esc_html_e('Establece el porcentaje por el cuál la página cargará la cookie de aceptar la política de cookies', 'click-datos-lopd'); ?></p>
                     </div>
                 <?php
             }
@@ -2340,43 +2106,19 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                 if (!in_array($current, $allowed_tabs, true)) {
                     $current = 'content';
                 }
-                $title = __('RGPD ClickDatos - Cookies', 'click-datos-lopd');
+                $title = __('RGPD Cookies y Páginas Legales - Cookies', 'click-datos-lopd');
                 ?>
-                <script>
-                    jQuery(document).ready(function () {
-                        jQuery("#boton").click(function (event) {
-                            document.getElementById('resultados').removeAttribute('style');
-                            var nombreu = document.getElementById("nombreu").value;
-                            var nombrec = document.getElementById("nombrec").value;
-                            var email = document.getElementById("email").value;
-                            var url = document.getElementById("url").value;
-                            var mensaje = document.getElementById("mensaje").value;
-                            if (nombreu === "" || email === "" || url === "") {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Rellene todos los datos con * del formulario. <br>Por favor.");
-                            } else if (!jQuery('#checkprivacidad').is(':checked')) {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Debes aceptar la Política de Privacidad para poder enviar el formulario.");
-                            } else {
-                                jQuery.post('<?php echo esc_url(CDLOPD_PLUGIN_URL . 'admin/mail-contacto.php'); ?>', {nombreu: nombreu, nombrec: nombrec, email: email, url: url, mensaje: mensaje, nonce: '<?php echo esc_js(wp_create_nonce('cdlopd_mail_contacto')); ?>'}, function (respuesta) {
-                                    if (respuesta === 'Tu correo ha sido enviado correctamente.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: green;');
-                                    } else if (respuesta === 'Hubo un problema al enviar el email, intentalo de nuevo.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                    }
-                                    jQuery('#resultados').html(respuesta);
-                                });
-                            }
-                        });
-                    });
-                </script>
                 <div class="wrap">
                     <h1><?php
-                        echo $title;
+                        echo esc_html($title);
                         $cu = wp_get_current_user();
                         ?></h1>
                     <!-- Button trigger modal -->
                     <button type="button" style="margin: auto;" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#myModal">¿Necesitas ayuda?</button>
+                    <p class="description" style="text-align:center; margin-top:1%;">
+                        ¿Tienes un problema? Abre una incidencia en
+                        <a href="https://github.com/raycoarana/rgpd-cookie-legal/issues" target="_blank" rel="noopener noreferrer">github.com/raycoarana/rgpd-cookie-legal/issues</a>.
+                    </p>
                     <!-- Modal -->
                     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg" style="width: 72% !important;">
@@ -2392,9 +2134,6 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                         <!-- Nav tabs -->
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li role="presentation" class="active">
-                                                <a href="#ObtenSoporte" aria-controls="ObtenSoporte" role="tab" data-toggle="tab">Consulta tu web</a>
-                                            </li>
-                                            <li role="presentation">
                                                 <a href="#queeslargpd" aria-controls="queeslargpd" role="tab" data-toggle="tab">¿Qué es la RGPD?</a>
                                             </li>
                                             <li role="presentation">
@@ -2412,45 +2151,6 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                                         </ul>
                                         <!-- Tab panes -->
                                         <div class="tab-content"  style="text-align: center;">
-                                            <div role="tabpanel" class="tab-pane active" id="ObtenSoporte">
-                                                <div class="form-horizontal">
-                                                    <h1>ClickDatos le hará una valoración a su web</h1><h2>Comprobará si cumple con la RGPD y le responderemos cuanto antes, de forma gratuíta.</h2>
-                                                    <p>Si tiene alguna duda sobre la RGPD, puede consultar las demás pestañas donde hablamos de los requisitos para cumplir con esta Ley.</p>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Nombre:*</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="nombreu" id="nombreu" value="<?php echo esc_attr($cu->user_login); ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Nombre Completo:</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="nombrec" id="nombrec" value="<?php echo esc_attr($cu->user_firstname . ' ' . $cu->user_lastname); ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Email:*</label>
-                                                        <div class="col-sm-8">
-                                                            <input type="text" class="form-control" name="email" id="email" value="<?php echo esc_attr($cu->user_email); ?>">
-                                                            <input type="hidden" id="url" value="<?php echo get_site_url(); ?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="control-label col-sm-2">Mensaje:</label>
-                                                        <div class="col-sm-8">
-                                                            <textarea class="form-control" name="mensaje" id="mensaje" placeholder="Introduce un mensaje..."></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="col-sm-3"></div>
-                                                        <div class="col-sm-5">
-                                                            <input type="checkbox" name="privacidad" id="checkprivacidad"> He leído y acepto <a target="_blank" rel="nofollow noopener noreferrer" href="https://www.aepd.es/">Política de Privacidad</a> | AEPD.<br>
-                                                            <button id="boton" class="btn btn-primary btn-lg" style="margin-top: 4%; margin-bottom: 4%;">Enviar consulta</button><br>
-                                                            <label id="resultados"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div role="tabpanel" class="tab-pane" id="queeslargpd">
                                                 <h2 style="text-align: center;">¿Qué es el Reglamento General de Protección de Datos?</h2>
                                                 <p>El pasado 25 de mayo de 2016 entró en vigor el nuevo Reglamento General de Protección de Datos (RGPD) que deroga la Directiva 95/46/CE y viene a sustituir la normativa que actualmente estaba vigente en los países de la UE . Tiene lugar con motivo de la&nbsp;<a title="El enlace se abrirá en una nueva ventana" href="http://www.europarl.europa.eu/news/es/news-room/20160407IPR21776/reforma-de-la-protecci%C3%B3n-de-datos-%E2%80%93-nuevas-reglas-adaptadas-a-la-era-digital" target="_blank" rel="nofollow noopener noreferrer">reforma normativa realizada por la Unión Europea</a>&nbsp; cuyo objetivo es adaptar la legislación vigente a las exigencias en los niveles de seguridad que demanda la realidad digital actual.</p>
@@ -2538,7 +2238,7 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
                             <form method="post" action="">
                                 <?php wp_nonce_field('cdlopd_reset_content'); ?>
                                 <p class="submit" style="text-align: center">
-                                    <input name="reset" style="width: 80%;" class="btn btn-default" type="submit" value="<?php _e('Valores por defecto', 'click-datos-lopd'); ?>" >
+                                    <input name="reset" style="width: 80%;" class="btn btn-default" type="submit" value="<?php esc_html_e('Valores por defecto', 'click-datos-lopd'); ?>" >
                                     <input type="hidden" name="action" value="reset" />
                                 </p>
                             </form>
@@ -2559,72 +2259,18 @@ Formular una reclamación en la Agencia Española de Protección de Datos no con
             public function inicio() {
                 $cu = wp_get_current_user();
                 ?>
-                <script>
-                    jQuery(document).ready(function () {
-                        jQuery("#boton").click(function (event) {
-                            document.getElementById('resultados').removeAttribute('style');
-                            var nombreu = document.getElementById("nombreu").value;
-                            var nombrec = document.getElementById("nombrec").value;
-                            var email = document.getElementById("email").value;
-                            var url = document.getElementById("url").value;
-                            var mensaje = document.getElementById("mensaje").value;
-                            if (nombreu === "" || email === "" || url === "") {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Rellene todos los datos con * del formulario. <br>Por favor.");
-                            } else if (!jQuery('#checkprivacidad').is(':checked')) {
-                                document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                jQuery('#resultados').html("Debes aceptar la Política de Privacidad para poder enviar el formulario.");
-                            } else {
-                                jQuery.post('<?php echo esc_url(CDLOPD_PLUGIN_URL . 'admin/mail-contacto.php'); ?>', {nombreu: nombreu, nombrec: nombrec, email: email, url: url, mensaje: mensaje, nonce: '<?php echo esc_js(wp_create_nonce('cdlopd_mail_contacto')); ?>'}, function (respuesta) {
-                                    if (respuesta === 'Tu correo ha sido enviado correctamente.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: green;');
-                                    } else if (respuesta === 'Hubo un problema al enviar el email, intentalo de nuevo.') {
-                                        document.getElementById('resultados').setAttribute('style', 'color: red;');
-                                    }
-                                    jQuery('#resultados').html(respuesta);
-                                });
-                            }
-                        });
-                    });
-                </script>
                 <div class="wrap">
-                    <h1>RGPD ClickDatos</h1>
+                    <h1>RGPD Cookies y Páginas Legales</h1>
                     <div class="cdlopd-banner vc_single_image-wrapper vc_box_shadow_3d  vc_box_border_grey" style="text-align: center">
                         
                         
                     </div>
                     <div class="form-horizontal sectionayuda" style="text-align: center;">
-                        <h2>Comprobaremos si cumple con la RGPD y le responderemos cuanto antes, de forma gratuíta.</h2>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="nombreu">Nombre:*</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="nombreu" id="nombreu" value="<?php echo esc_attr($cu->user_login); ?>">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="nombrec">Nombre Completo:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="nombrec" id="nombrec" value="<?php echo esc_attr($cu->user_firstname . ' ' . $cu->user_lastname); ?>">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="email">Email:*</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="email" id="email" value="<?php echo esc_attr($cu->user_email); ?>">
-                                <input type="hidden" id="url" value="<?php echo get_site_url(); ?>">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="mensaje">Mensaje:</label>
-                            <div class="col-sm-8">
-                                <textarea class="form-control" name="mensaje" id="mensaje" placeholder="Introduce un mensaje..."></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <input type="checkbox" name="privacidad" id="checkprivacidad"> He leído y acepto <a target="_blank" rel="nofollow noopener noreferrer" href="https://www.aepd.es/">Política de Privacidad</a> | AEPD.<br>
-                            <button id="boton" class="btn btn-primary btn-lg" style="margin-top: 2%;">Enviar consulta</button><br><br>                        
-                            <label id="resultados"></label>
-                        </div>
+                        <p class="description">
+                            <strong>¿Necesitas ayuda?</strong>
+                            Abre una incidencia en
+                            <a href="https://github.com/raycoarana/rgpd-cookie-legal/issues" target="_blank" rel="noopener noreferrer">github.com/raycoarana/rgpd-cookie-legal/issues</a>.
+                        </p>
                     </div>
                     <hr>
                     <h2 style="text-align: center;">¿Qué es el Reglamento General de Protección de Datos?</h2>

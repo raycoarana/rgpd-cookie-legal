@@ -146,48 +146,48 @@ if (!class_exists('CDLOPD_Public')) { // Don't initialise if there's already a c
                 if (!isset($cdlopd_content_settings['text_color'])) {
                     $cdlopd_content_settings['text_color'] = '';
                 }
-                $text_color = $cdlopd_content_settings['text_color'];
+                $text_color = sanitize_hex_color($cdlopd_content_settings['text_color']) ?: '#000000';
 
                 if (!isset($cdlopd_content_settings['bg_color'])) {
                     $cdlopd_content_settings['bg_color'] = '';
                 }
-                $bg_color = $cdlopd_content_settings['bg_color'];
+                $bg_color = sanitize_hex_color($cdlopd_content_settings['bg_color']) ?: '#ffffff';
 
                 if (!isset($cdlopd_content_settings['link_color'])) {
                     $cdlopd_content_settings['link_color'] = '';
                 }
-                $link_color = $cdlopd_content_settings['link_color'];
+                $link_color = sanitize_hex_color($cdlopd_content_settings['link_color']) ?: '#000000';
                 
                 if(!isset($cdlopd_content_settings['grosor_border'])){
                     $cdlopd_content_settings['grosor_border'] = '';
                 }
-                $grosor_border = $cdlopd_content_settings['grosor_border'];
+                $grosor_border = absint($cdlopd_content_settings['grosor_border']);
                 
                 if(!isset($cdlopd_content_settings['color_border'])){
                     $cdlopd_content_settings['color_border'] = '';
                 }
-                $color_border = $cdlopd_content_settings['color_border'];
+                $color_border = sanitize_hex_color($cdlopd_content_settings['color_border']) ?: '#000000';
                 
                 //Agrega los colores para el boton aceptar
                 if (!isset($cdlopd_content_settings['button_bg_color_aceptar'])) {
                     $cdlopd_content_settings['button_bg_color_aceptar'] = '#90CD0D';
                 }
-                $button_bg_aceptar = $cdlopd_content_settings['button_bg_color_aceptar'];
+                $button_bg_aceptar = sanitize_hex_color($cdlopd_content_settings['button_bg_color_aceptar']) ?: '#90cd0d';
 
                 if (!isset($cdlopd_content_settings['button_color_aceptar'])) {
                     $cdlopd_content_settings['button_color_aceptar'] = '#fff';
                 }
-                $button_color_aceptar = $cdlopd_content_settings['button_color_aceptar'];
+                $button_color_aceptar = sanitize_hex_color($cdlopd_content_settings['button_color_aceptar']) ?: '#ffffff';
                 //Agrega los colores para el boton rechazar
                 if (!isset($cdlopd_content_settings['button_bg_color_rechazar'])) {
                     $cdlopd_content_settings['button_bg_color_rechazar'] = '#CD0D0D';
                 }
-                $button_bg_rechazar = $cdlopd_content_settings['button_bg_color_rechazar'];
+                $button_bg_rechazar = sanitize_hex_color($cdlopd_content_settings['button_bg_color_rechazar']) ?: '#cd0d0d';
 
                 if (!isset($cdlopd_content_settings['button_color_rechazar'])) {
                     $cdlopd_content_settings['button_color_rechazar'] = '#fff';
                 }
-                $button_color_rechazar = $cdlopd_content_settings['button_color_rechazar'];
+                $button_color_rechazar = sanitize_hex_color($cdlopd_content_settings['button_color_rechazar']) ?: '#ffffff';
                 
                 if (!isset($cdlopd_content_settings['duracion_cookie_aceptar'])) {
                     $cdlopd_content_settings['duracion_cookie_aceptar'] = '';
@@ -242,6 +242,7 @@ if (!class_exists('CDLOPD_Public')) { // Don't initialise if there's already a c
 					min-height: 30px;
 				}';
                 $css .= '</style>';
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- This intentionally emits generated CSS inside a style element; user-controlled CSS values are sanitized above.
                 echo $css;
                 // Add it to the header
             }
@@ -274,7 +275,7 @@ if (!class_exists('CDLOPD_Public')) { // Don't initialise if there's already a c
 
                         } else {
                             $("body").addClass("has-cookie-bar");
-                            $("body").addClass("cookie-bar-<?php echo $type; ?>");
+                            $("body").addClass("cookie-bar-<?php echo esc_attr($type); ?>");
                         }
 
 //                        if (catapultReadCookie('catAccCookies') || catapultReadCookie("catAccCookiesDeny")) {
@@ -490,6 +491,7 @@ $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
 
                 $content .= '</div><!-- #catapult-cookie-bar -->';
 
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered cookie-banner markup is intentionally HTML; interpolated content is escaped or KSES-filtered before assembly.
                 echo apply_filters('catapult_cookie_content', $content, $cdlopd_content_settings);
             }
         }
@@ -498,6 +500,7 @@ $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
             if (isset($_COOKIE['catAccCookies']) && $_COOKIE['catAccCookies'] == 1) {
                 if (get_post_meta(11122, 'sheader', TRUE) == true) {
                     $scriptsheader = get_post_meta(11122, 'sheader', TRUE);
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentionally outputs administrator-configured script blocks after consent.
                     echo $scriptsheader;
                 }
             }
@@ -507,6 +510,7 @@ $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
             if (isset($_COOKIE['catAccCookies']) && $_COOKIE['catAccCookies'] == 1) {
                 if (get_post_meta(11123, 'sfooter', TRUE) == true) {
                     $scriptsfooter = get_post_meta(11123, 'sfooter', TRUE);
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentionally outputs administrator-configured script blocks after consent.
                     echo $scriptsfooter;
                 }
             }

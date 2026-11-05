@@ -1,9 +1,10 @@
-=== RGPD Cookies y Páginas Legales (fork) ===
+=== RGPD Cookies y Páginas Legales ===
 Contributors: raycoarana
-Tags: LOPD, RGPD, politica de cookies,proteccion datos, clausulas legales
+Tags: LOPD, RGPD, politica de cookies, proteccion datos, clausulas legales
 Requires at least: 4.7
+Requires PHP: 7.0
 Tested up to: 6.7
-Stable tag: 3.1.1
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,13 +20,22 @@ distribuido bajo GPLv2 o posterior. El original fue cerrado en WordPress.org el
 Cambios respecto al original (GPLv2 §2a):
 * Corregido XSS reflejado (CVE-2023-46071).
 * Corregida inyección SQL en la búsqueda de formularios.
-* Endurecido `admin/mail-contacto.php` (antes endpoint sin autenticación).
+* Retirado el envío de soporte integrado; las incidencias se gestionan en GitHub.
 * Añadidas comprobaciones de capacidad y nonces (protección CSRF).
 * Saneado y escapado de salidas.
-* Eliminada la dependencia del servicio externo clickdatos.es.
+* Eliminadas las dependencias de servicios externos.
+
+== Licencia de terceros ==
+
+Este plugin incluye las siguientes bibliotecas de terceros, todas compatibles con la GPL:
+
+* Bootstrap 3.3.7 (CSS y JS) — licencia MIT — https://getbootstrap.com
+* Bootstrap Toggle 2.2.0 — licencia MIT — https://github.com/minhur/bootstrap-toggle
+
+jQuery se carga desde el núcleo de WordPress (`wp_enqueue_script('jquery')`), no se incluye.
 
 == Description ==
-ClickDatos LOPD plugin realiza las siguientes funciones:
+El plugin realiza las siguientes funciones:
 1-Creación de las paginas de Aviso legal, Politica de cookies y Politica de privacidad con los datos que se rellenen en el formulario Lopd para formularios.
 2-Inserción de banner de politica de cookies con distintas posibilidades de personalización y colocación
 3-Inserción de las clausulas de proteccion de datos en los formularios realizados con el plugin Contact Form de la página web.
@@ -33,10 +43,15 @@ ClickDatos LOPD plugin realiza las siguientes funciones:
 
 == Installation ==
 
-1.Sube la carpeta completa click-datos-lopd al directorio /wp-content/plugins/ o busca en el repositorio de plugin de wordpress por RGPD
+1.Sube la carpeta completa rgpd-cookie-legal al directorio /wp-content/plugins/ o busca en el repositorio de plugin de wordpress por RGPD
 2.Activa el plugin desde el menú ‘Plugins’ de WordPress.
 3.Si usted tiene instalado cualquier plugin de chache es recomendable borrar cache una vez se ha terminado la instalación y activación
-Encontrarás el menú ‘RGPD ClickDatos’ en tu panel de administración de WordPress.
+Encontrarás el menú ‘RGPD Cookies y Páginas Legales’ en tu panel de administración de WordPress.
+
+== Support ==
+
+Abre una incidencia en https://github.com/raycoarana/rgpd-cookie-legal/issues.
+
 == Frequently Asked Questions ==
 = ¿Páginas necesarias? =
 En este plugin se incorporarán las páginas de Política de Privacidad, Política de Cookies y Aviso Legal, en estas aparecerá toda la información referente a la empresa o entidad que recoge y se hace responsable de los datos recibidos, dónde y cómo el usuario puede dirigirse a la empresa para ejercer sus derechos ARCO.
@@ -66,13 +81,13 @@ Conseguir información sobre los hábitos de navegación del usuario, e intentos
 
 = ¿Qué pasa si mi web utiliza una nueva cookie no registrada anteriormente? =
 El plugin te  avisará, lo único que tendrá que hacer será añadir la información en el caso de que no la tenga y el plugin la añadirá a su Política de cookies. 
-Si esta no es reconocida por el plugin le recomendamos que se ponga en contacto con ClickDatos.
+Si esta no es reconocida por el plugin, añada manualmente su información.
 
 = ¿Qué puedo hacer para no sobrescribir una página? =
 En nuestro plugin añadimos a cada página una etiqueta HTML, deberá eliminar el atributo id=\"clickdatos\" del su página para que el plugin no sobrescriba dicha página al actualizarlas.
 
 = ¿Tengo dudas sobre el RGPD en mi negocio? ¿Qué hago? =
-En el menú principal del plugin encontrará mucha información sobre el RGPD. Si aun así, sigue teniendo dudas puede enviarnos un email con su consulta desde el mismo plugin, ClickDatos le hará una valoración de su web y se pondrá en contacto con usted lo antes posible.
+Si tiene dudas o necesita ayuda, puede abrir una incidencia en https://github.com/raycoarana/rgpd-cookie-legal/issues.
 
 = ¿Qué es el SSL? ¿Es necesario? =
 SSL significa \"Secure Sockets Layer\". Es un protocolo diseñado para proteger la información de ida y vuelta que se transmite desde tu ordenador hasta la web. 
@@ -89,6 +104,13 @@ Un certificado SSL es esencial en nuestra página web puesto que su función es 
 7. Avisos de plugin back-end
 
 == Changelog ==
+= 1.0.0 =
+* Primera versión del fork mantenido. Renumeración desde 3.1.1 del original.
+* Corregido XSS reflejado (CVE-2023-46071) y una inyección SQL en la búsqueda de formularios.
+* Retirado el formulario de soporte y el envío de datos a servicios externos; las incidencias se gestionan en GitHub.
+* Añadidas comprobaciones de capacidad y nonces (protección CSRF) en el panel de administración.
+* Saneado y escapado de salidas; Bootstrap servido localmente en lugar de por CDN.
+* Menú y textos renombrados a "RGPD Cookies y Páginas Legales".
 = 3.1.0 =
 * Cambio de texto popup cookies para nuevas instalaciones.
 = 3.0.8 =
@@ -140,7 +162,6 @@ Un certificado SSL es esencial en nuestra página web puesto que su función es 
 * Se ha añadido opciones de borrar las clausulas en los formularios.
 * Se ha añadido la posibilidad de añadir las clausulas solo a los formularios seleccionados.
 * Se almacenan los datos de de creación de las paginas legales para futura modificaciones de dichas paginas
-* Formulario de ayuda.
 * Añadida información referente a la RGPD y su normativa.
 
 = 1.0 =

@@ -1,4 +1,4 @@
-# RGPD Cookies y Páginas Legales (fork)
+# RGPD Cookies y Páginas Legales
 
 Mantenimiento del plugin abandonado **"Protección de Datos RGPD"**
 (slug original `click-datos-lopd`), cerrado en WordPress.org en marzo de 2024
@@ -20,7 +20,7 @@ Detalles: https://wpscan.com/vulnerability/9f03b04a-001d-4faf-a424-42f0123c2424/
 |---|----------|-----------|------------|
 | 1 | Alta (CVE) | `admin/class-cdlopd-admin.php` | Escape de salida de `busqueda` (`esc_attr`) |
 | 2 | Alta | `admin/class-cdlopd-admin.php` | Inyección SQL corregida con `$wpdb->prepare()` + `esc_like()` |
-| 3 | Crítica | `admin/mail-contacto.php` | Endpoint sin autenticación: añadido nonce + capacidad, validación de email, destino al admin del sitio |
+| 3 | Crítica | Envío de soporte | Retirado; las incidencias se gestionan en GitHub |
 | 4 | Alta | `admin/class-cdlopd-admin.php` | Validación de `tab` contra lista blanca; eliminado `reset` sin uso |
 | 5 | Alta | `admin/class-cdlopd-admin.php` | Capacidad + nonce al guardar scripts de cabecera/pie |
 | 6 | Media | `admin/class-cdlopd-admin.php` | Validación de email rota (`&&` → `||`) |

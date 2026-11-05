@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  php-lint:
+    name: PHP lint (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+      - name: Lint PHP files
+        shell: bash
+        run: |
+          FAIL=0
+          while IFS= read -r -d '' file; do
+            php -l "$file" || FAIL=1
+          done < <(find . -type f -name '*.php' -not -path '*/vendor/*' -print0)
+          exit "$FAIL"
+
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+      - name: Install PHPCS and WordPress standards
+        run: composer install --no-interaction --no-progress
+      - name: Run PHPCS
+        shell: bash
+        run: |
+          if [[ ! -f phpcs.xml.dist ]]; then
+            echo "PHPCS skipped: phpcs.xml.dist is not present yet."
+            exit 0
+          fi
+          vendor/bin/phpcs --standard=phpcs.xml.dist .

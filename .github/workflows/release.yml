@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tag name to release (for example, v1.0.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate tag matches plugin version
+        shell: bash
+        env:
+          TAG: ${{ github.event.inputs.version || github.ref_name }}
+        run: |
+          set -euo pipefail
+          # The version is declared in three places; the release tag must match all of them.
+          EXPECTED="${TAG#v}"   # v1.0.0 -> 1.0.0
+
+          HEADER=$(grep -m1 "^[[:space:]]*Version:" rgpd-cookie-legal.php | sed 's/^[^:]*:[[:space:]]*//' | tr -d '[:space:]')
+          STABLE=$(grep -m1 "^Stable tag:" readme.txt | sed 's/^[^:]*:[[:space:]]*//' | tr -d '[:space:]')
+          STABLE_ES=$(grep -m1 "^Stable tag:" readme-es.txt | sed 's/^[^:]*:[[:space:]]*//' | tr -d '[:space:]')
+
+          echo "Tag:                ${TAG} (expected: ${EXPECTED})"
+          echo "Plugin header:      ${HEADER}"
+          echo "readme.txt:         ${STABLE}"
+          echo "readme-es.txt:      ${STABLE_ES}"
+
+          FAIL=0
+          if [ -z "${EXPECTED}" ]; then
+            echo "::error::Could not derive a version from tag '${TAG}'."
+            FAIL=1
+          fi
+          if [ "${HEADER}" != "${EXPECTED}" ]; then
+            echo "::error::Version mismatch: rgpd-cookie-legal.php has '${HEADER}', tag says '${EXPECTED}'."
+            FAIL=1
+          fi
+          if [ "${STABLE}" != "${EXPECTED}" ]; then
+            echo "::error::Version mismatch: readme.txt Stable tag has '${STABLE}', tag says '${EXPECTED}'."
+            FAIL=1
+          fi
+          if [ "${STABLE_ES}" != "${EXPECTED}" ]; then
+            echo "::error::Version mismatch: readme-es.txt Stable tag has '${STABLE_ES}', tag says '${EXPECTED}'."
+            FAIL=1
+          fi
+          if [ "${FAIL}" -ne 0 ]; then
+            echo "::error::Release aborted. Bump the version in all three files, commit, then re-tag."
+            exit 1
+          fi
+          echo "::notice::Version ${EXPECTED} is consistent across tag, plugin header and both readmes."
+
+      - name: Build distribution tree
+        shell: bash
+        run: |
+          mkdir -p build/rgpd-cookie-legal
+          if [[ -f .distignore ]]; then
+            rsync -a --exclude-from=.distignore --exclude='build/' --exclude='.git/' ./ build/rgpd-cookie-legal/
+          else
+            echo ".distignore is missing; copying repository files except build/ and .git/."
+            rsync -a --exclude='build/' --exclude='.git/' ./ build/rgpd-cookie-legal/
+          fi
+      - name: Create and inspect plugin zip
+        run: |
+          cd build
+          zip -qr ../rgpd-cookie-legal.zip rgpd-cookie-legal
+          cd ..
+          unzip -l rgpd-cookie-legal.zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
+          generate_release_notes: true
+          files: rgpd-cookie-legal.zip

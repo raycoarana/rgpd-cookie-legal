@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: RGPD Cookies y Páginas Legales (fork)
+Plugin Name: RGPD Cookies y Páginas Legales
 Plugin URI: https://github.com/raycoarana/rgpd-cookie-legal
 Description: Mantenimiento del plugin abandonado "Protección de Datos RGPD" (RGPD LOPD). Páginas legales, banner de cookies, cláusulas legales. Fork parcheado de seguridad.
-Version: 3.1.1
+Version: 1.0.0
 Author: raycoarana
 Author URI: https://github.com/raycoarana
 Text Domain: click-datos-lopd
@@ -20,10 +20,10 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Cambios respecto al original (GPLv2 §2a — cambios señalados):
  *  - Corregido XSS reflejado (CVE-2023-46071) en admin/class-cdlopd-admin.php.
  *  - Corregida inyección SQL en la misma función.
- *  - Corregido mail-contacto.php (endpoint sin autenticación).
+ *  - Eliminado el formulario de soporte por correo.
  *  - Añadidas comprobaciones de capacidad y nonces (CSRF).
  *  - Saneado/escapado de salidas.
- *  - Eliminada la dependencia del servicio externo clickdatos.es.
+ *  - Eliminadas dependencias de servicios externos.
  */
 // Añadimos seguridad y definimos constantes.
 if ( ! defined( 'ABSPATH' ) ) { 

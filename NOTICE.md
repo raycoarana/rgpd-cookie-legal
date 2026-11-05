@@ -26,18 +26,15 @@ se distribuya bajo la misma licencia. Esto es lo que hace este repositorio.
   (CVE-2023-46071, CVSS 7.1).
 - Corregida **inyección SQL** en la búsqueda de formularios
   (`$wpdb` sin `prepare()`).
-- Endurecido `admin/mail-contacto.php`: antes era un endpoint sin
-  autenticación que enviaba datos a un tercero (`plugin@clickdatos.es`).
-  Ahora exige sesión + capacidad + nonce, valida el email y envía al
-  administrador del sitio.
+- Eliminado el formulario de contacto y el envío de correo asociado.
 - Añadidas comprobaciones de capacidad (`current_user_can`) y **nonces**
   (protección CSRF) en el panel de administración.
 - Saneado/escapado de salidas (`esc_attr`, `esc_html`, `esc_textarea`,
   `esc_url`, `sanitize_*`).
-- Eliminadas las referencias y llamadas al servicio externo `clickdatos.es`.
+- Eliminadas las dependencias de servicios externos.
 
 ## Marca
 
 Este fork **no** usa la marca, el nombre ni el slug originales. El nombre
 "ClickDatos" y "Protección de Datos RGPD" pertenecen a sus titulares.
-El fork se distribuye bajo el nombre **RGPD Cookies y Páginas Legales (fork)**.
+El fork se distribuye bajo el nombre **RGPD Cookies y Páginas Legales**.
